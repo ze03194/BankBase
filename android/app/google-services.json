@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1735631735",
+    "project_id": "bankbasemobile-8f88e",
+    "storage_bucket": "bankbasemobile-8f88e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1735631735:android:2513dc0f4f3905073c3772",
+        "android_client_info": {
+          "package_name": "com.bankbasemobile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1735631735-hoahtpv16qq533nod38418vhd7edq60f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBvF6zACI_XuPmX2Wq-FL_n4_mXoUVQHFY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1735631735-hoahtpv16qq533nod38418vhd7edq60f.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
