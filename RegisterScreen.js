@@ -32,7 +32,6 @@ const RegisterScreen = (props) => {
             [key]: value,
         }, []);
     };
-
     const registerButtonHandler = () => {
         firebase.auth().createUserWithEmailAndPassword(registration.emailAddress, registration.password)
             .then(() => {

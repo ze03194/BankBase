@@ -35,8 +35,35 @@ const app = initializeApp(firebaseConfig);
 const Stack = createNativeStackNavigator();
 
 const App = () => {
+    // const appState = useRef(AppState.currentState);
     const [initializing, setInitializing] = useState(true);
     const [user, setUser] = useState();
+    // const [appStateVisible, setAppStateVisible] = useState(appState.current);
+    //
+    //
+    // const _handleAppStateChange = (nextAppState) => {
+    //     if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
+    //         console.log('App has come to the foreground!');
+    //     }
+    //     appState.current = nextAppState;
+    //     setAppStateVisible(appState.current);
+    //     if (appState.current === 'background') {
+    //         firebase.auth().signOut()
+    //             .then(() => {
+    //                 console.log('signed out');
+    //             })
+    //             .catch((error => {
+    //                 console.log(error);
+    //             }));
+    //     }
+    // };
+    // useEffect(() => {
+    //     AppState.addEventListener('change', _handleAppStateChange);
+    //     return () => {
+    //
+    //     };
+    // }, []);
+
 
     function onAuthStateChanged(user) {
         setUser(user);

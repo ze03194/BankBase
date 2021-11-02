@@ -24,7 +24,6 @@ const HomeScreen = ({navigation}) => {
                     <Text style={styles.topBarText}>Contact Us</Text>
                 </TouchableOpacity>
             </View>
-
             <View>
                 <Text style={{fontSize: 25, color: 'white'}}>Why Us?</Text>
                 <Text style={styles.paragraphText}>
