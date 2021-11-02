@@ -80,6 +80,9 @@ const App = () => {
 
     return (
         <NavContain/>
+        // <TouchableOpacity onPress={firebase.auth().signOut}>
+        //
+        // </TouchableOpacity>
     );
 };
 

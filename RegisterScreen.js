@@ -22,7 +22,6 @@ const RegisterScreen = (props) => {
         state: '',
         zipCode: '',
         securityPin: '',
-        accountNumber: null,
         balance: 0,
     });
     console.log(registration);
@@ -31,13 +30,12 @@ const RegisterScreen = (props) => {
         setRegistration({
             ...registration,
             [key]: value,
-            accountNumber: Math.floor(10000000 + Math.random() * 99999999),
-        });
+        }, []);
     };
 
     const registerButtonHandler = () => {
         firebase.auth().createUserWithEmailAndPassword(registration.emailAddress, registration.password)
-            .then((result) => {
+            .then(() => {
                 firebase.firestore().collection('users')
                     .doc(firebase.auth().currentUser.uid)
                     .set({
@@ -49,17 +47,24 @@ const RegisterScreen = (props) => {
                         city: registration.city,
                         state: registration.state,
                         zipCode: registration.zipCode,
-                        accountNumber: registration.accountNumber,
-                    }).then(r => {
-                    console.log(r);
-                });
-                console.log(result);
+                    })
+                    .then(() => {
+                        const accNum = Math.floor(10000000 + Math.random() * 99999999);
+                        firebase.firestore().collection('users')
+                            .doc(firebase.auth().currentUser.uid)
+                            .collection('bankAccounts').doc(accNum.toString()).set({
+                            userID: firebase.auth().currentUser.uid,
+                            balance: registration.balance,
+                            accountNumber: accNum,
+                        })
+                            .then((result) => {
+                                console.log(result);
+                            });
+                    });
             })
             .catch(error => {
                 console.log(error);
             });
-
-
     };
     return (
         <SafeAreaView style={styles.registerContainer}>

@@ -12,6 +12,7 @@ const auth = firebase.auth();
 const Stack = createNativeStackNavigator();
 
 const LoggedInScreen = ({navigation}) => {
+    const [accountNumb, setAccountNumb] = useState(123456789);
     const [user, setUser] = useState({
         emailAddress: '',
         firstName: '',
@@ -43,13 +44,24 @@ const LoggedInScreen = ({navigation}) => {
                     state: documentSnapshot.get('state'),
                     zipCode: documentSnapshot.get('zipCode'),
                     emailAddress: documentSnapshot.get('emailAddress'),
-                    accountNumber: documentSnapshot.get('accountNumber'),
+                    // accountNumber: documentSnapshot.get('accountNumber'),
+                    accountNumber: firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid)
+                        .collection('bankAccounts').where('userID', '==', firebase.auth().currentUser.uid)
+                        .get()
+                        .then(querySnapshot => {
+                            querySnapshot.forEach(documentSnapshot => {
+                                setAccountNumb(documentSnapshot.get('accountNumber'));
+                            });
+                        }),
                 });
+
             })
             .catch((error => {
                 console.log(error);
             }));
     };
+    console.log('acct#1: ', accountNumb);
+
     return (
 
         <SafeAreaView style={styles.mainContainer}>
@@ -85,7 +97,7 @@ const LoggedInScreen = ({navigation}) => {
                             borderBottomWidth: 1,
                         }}>
                             <TouchableOpacity onPress={() => navigation.navigate('Accounts')}>
-                                <Text>...{user.accountNumber.toString().substring(4, 8)}</Text>
+                                <Text>...{accountNumb}</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -93,9 +105,7 @@ const LoggedInScreen = ({navigation}) => {
             </ScrollView>
         </SafeAreaView>
     );
-
 };
-
 
 const styles = StyleSheet.create({
     mainContainer: {
