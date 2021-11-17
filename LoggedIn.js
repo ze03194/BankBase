@@ -5,11 +5,10 @@ import {firebase} from '@react-native-firebase/app';
 import '@react-native-firebase/auth';
 import '@react-native-firebase/firestore';
 import SafeAreaView from 'react-native/Libraries/Components/SafeAreaView/SafeAreaView';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
 const db = firebase.firestore();
 const auth = firebase.auth();
-const Stack = createNativeStackNavigator();
+// const Stack = createNativeStackNavigator();
 
 const LoggedInScreen = ({navigation}) => {
     const [accountNumb, setAccountNumb] = useState(123456789);
@@ -69,9 +68,6 @@ const LoggedInScreen = ({navigation}) => {
                 <Image style={styles.logoImg} source={require('../BankBaseMobile/images/BankBaseLogo.png')}/>
             </View>
             <View style={styles.topBarContainer}>
-                <TouchableOpacity onPress={() => navigation.navigate('Home')}>
-                    <Text style={styles.topBarText}>Home</Text>
-                </TouchableOpacity>
                 <TouchableOpacity onPress={() => firebase.auth().signOut()}>
                     <Text style={styles.topBarText}>Log Out</Text>
                 </TouchableOpacity>
@@ -82,8 +78,8 @@ const LoggedInScreen = ({navigation}) => {
             <Text style={styles.welcomeText}>Welcome {user.firstName}</Text>
 
             <ScrollView contentContainerStyle={styles.scrollContainer}>
-                <View style={styles.testing}>
-                    <View style={styles.testing1}>
+                <View style={styles.accountBoxContainer}>
+                    <View style={styles.topBoxContainer}>
                         <Text style={{color: 'white', alignSelf: 'center', marginTop: 15}}>Accounts</Text>
                         <View style={{
                             minWidth: 300,
@@ -96,11 +92,22 @@ const LoggedInScreen = ({navigation}) => {
                             borderRightWidth: 1,
                             borderBottomWidth: 1,
                         }}>
-                            <TouchableOpacity onPress={() => navigation.navigate('Accounts')}>
-                                <Text>...{accountNumb}</Text>
-                            </TouchableOpacity>
+                            <ScrollView>
+                                <TouchableOpacity onPress={() => navigation.navigate('Accounts')}>
+                                    <Text>...{accountNumb.toString().substring(4)}</Text>
+                                </TouchableOpacity>
+                            </ScrollView>
+
                         </View>
                     </View>
+                </View>
+                <View style={styles.bottomNavBar}>
+                    <TouchableOpacity onPress={() => navigation.navigate('SendMoney')}>
+                        <Text style={{color: 'white'}}>Send Money</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => navigation.navigate('SendMoney')}>
+                        <Text style={{color: 'white'}}>Request Money</Text>
+                    </TouchableOpacity>
                 </View>
             </ScrollView>
         </SafeAreaView>
@@ -132,18 +139,25 @@ const styles = StyleSheet.create({
         width: 425,
         height: 80,
     },
-    testing: {
+    accountBoxContainer: {
         minWidth: 250,
         minHeight: 250,
         backgroundColor: 'white',
         marginTop: 10,
-    }, testing1: {
+    },
+    topBoxContainer: {
         minWidth: 300,
         maxWidth: 300,
         minHeight: 50,
         marginTop: 20,
         backgroundColor: '#02295F',
         alignSelf: 'center',
+    },
+    bottomNavBar: {
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-evenly',
+        marginTop: 10,
     },
 
 

@@ -14,7 +14,6 @@ import {firebase} from '@react-native-firebase/app';
 import '@react-native-firebase/auth';
 import '@react-native-firebase/firestore';
 import {NavigationContainer} from '@react-navigation/native';
-import HomeScreen from './HomeScreen';
 import LoginScreen from './LoginScreen';
 import RegisterScreen from './RegisterScreen';
 import AccountsScreen from './AccountsScreen';
@@ -88,9 +87,9 @@ const App = () => {
                     screenOptions={{
                         headerShown: false,
                     }}>
-                    <Stack.Screen
-                        name="Home"
-                        component={HomeScreen}/>
+                    {/*<Stack.Screen*/}
+                    {/*    name="Home"*/}
+                    {/*    component={HomeScreen}/>*/}
                     <Stack.Screen
                         name="Login"
                         component={LoginScreen}/>
@@ -107,9 +106,6 @@ const App = () => {
 
     return (
         <NavContain/>
-        // <TouchableOpacity onPress={firebase.auth().signOut}>
-        //
-        // </TouchableOpacity>
     );
 };
 

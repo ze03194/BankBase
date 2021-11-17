@@ -7,7 +7,7 @@ import HomeScreen from './HomeScreen';
 import LoginScreen from './LoginScreen';
 import RegisterScreen from './RegisterScreen';
 import AccountsScreen from './AccountsScreen';
-
+import SendMoneyScreen from './SendMoneyScreen';
 const Stack = createNativeStackNavigator();
 
 function NavContain() {
@@ -21,8 +21,8 @@ function NavContain() {
                     name="LoggedIn"
                     component={LoggedInScreen}/>
                 <Stack.Screen
-                    name="Home"
-                    component={HomeScreen}/>
+                    name="SendMoney"
+                    component={SendMoneyScreen}/>
                 <Stack.Screen
                     name="Login"
                     component={LoginScreen}/>
@@ -35,7 +35,7 @@ function NavContain() {
             </Stack.Navigator>
         </NavigationContainer>
     );
-    
+
 }
 
 export default NavContain;

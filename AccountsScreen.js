@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {firebase} from '@react-native-firebase/app';
 import '@react-native-firebase/auth';
@@ -11,25 +11,31 @@ const auth = firebase.auth();
 
 const AccountsScreen = ({navigation}, user) => {
     const [userAccount, setUserAccount] = useState({
-        accountNumber: '',
-        userID: '',
+        accountNumber: 123,
         balance: 0,
     });
 
+    useEffect(() => {
+        getAcctInfo();
+        return () => {
+            setUserAccount({});
+        };
+    }, []);
 
-    db.collection('users').doc(auth.currentUser.uid).get()
-        .then(documentSnapshot => {
-            userAccount.accountNumber = documentSnapshot.get('accountNumber');
-            userAccount.userID = auth.currentUser.uid;
-        });
-    firebase.firestore().collection('bankAccounts').add({
-        accountNumber: userAccount.accountNumber,
-        userID: userAccount.userID,
-        balance: userAccount.balance,
-    })
-        .then((result) => {
-            console.log(result);
-        });
+    const getAcctInfo = () => {
+        firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid)
+            .collection('bankAccounts').where('userID', '==', firebase.auth().currentUser.uid)
+            .get()
+            .then(querySnapshot => {
+                querySnapshot.forEach(documentSnapshot => {
+                    setUserAccount({
+                        accountNumber: documentSnapshot.get('accountNumber'),
+                        balance: documentSnapshot.get('balance'),
+                    });
+                });
+            });
+    };
+
 
     return (
         <SafeAreaView style={styles.mainContainer}>
@@ -37,9 +43,9 @@ const AccountsScreen = ({navigation}, user) => {
                 <Image style={styles.logoImg} source={require('../BankBaseMobile/images/BankBaseLogo.png')}/>
             </View>
             <View style={styles.topBarContainer}>
-                <TouchableOpacity onPress={() => navigation.navigate('Home')}>
-                    <Text style={styles.topBarText}>Home</Text>
-                </TouchableOpacity>
+                {/*<TouchableOpacity onPress={() => navigation.navigate('Home')}>*/}
+                {/*    <Text style={styles.topBarText}>Home</Text>*/}
+                {/*</TouchableOpacity>*/}
                 <TouchableOpacity onPress={() => firebase.auth().signOut()}>
                     <Text style={styles.topBarText}>Log Out</Text>
                 </TouchableOpacity>
@@ -50,12 +56,12 @@ const AccountsScreen = ({navigation}, user) => {
                     <Text style={styles.topBarText}>Portal</Text>
                 </TouchableOpacity>
             </View>
-            <Text style={styles.welcomeText}>Welcome {user.firstName}</Text>
+            {/*<Text style={styles.welcomeText}>Welcome {user.firstName}</Text>*/}
 
             <ScrollView contentContainerStyle={styles.scrollContainer}>
                 <View style={styles.testing}>
                     <View style={styles.testing1}>
-                        <Text style={{color: 'white', alignSelf: 'center', marginTop: 15}}>Transactions</Text>
+                        <Text style={{color: 'white', alignSelf: 'center', marginTop: 15}}>Recent Transactions</Text>
                         <View style={{
                             minWidth: 300,
                             maxWidth: 300,
@@ -68,7 +74,7 @@ const AccountsScreen = ({navigation}, user) => {
                             borderBottomWidth: 1,
                         }}>
                             <TouchableOpacity>
-                                <Text>...123</Text>
+                                <Text>...{userAccount.accountNumber.toString().substring(4, 9)}</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
