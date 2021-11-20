@@ -45,9 +45,7 @@ const LoggedInScreen = ({navigation}) => {
                     zipCode: documentSnapshot.get('zipCode'),
                     emailAddress: documentSnapshot.get('emailAddress'),
                     // accountNumber: documentSnapshot.get('accountNumber'),
-                    accountNumber: firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid)
-                        .collection('bankAccounts').where('userID', '==', firebase.auth().currentUser.uid)
-                        .get()
+                    accountNumber: firebase.firestore().collection('bankAccounts').where('userID', '==', firebase.auth().currentUser.uid).get()
                         .then(querySnapshot => {
                             querySnapshot.forEach(documentSnapshot => {
                                 setAccountNumb(documentSnapshot.get('accountNumber'));

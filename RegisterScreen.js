@@ -57,9 +57,7 @@ const RegisterScreen = (props) => {
                             zipCode: registration.zipCode,
                         })
                         .then(() => {
-                            firebase.firestore().collection('users')
-                                .doc(firebase.auth().currentUser.uid)
-                                .collection('bankAccounts').doc(accNum.toString()).set({
+                            firebase.firestore().collection('bankAccounts').doc(accNum.toString()).set({
                                 userID: firebase.auth().currentUser.uid,
                                 balance: registration.balance,
                                 accountNumber: accNum,
@@ -67,16 +65,16 @@ const RegisterScreen = (props) => {
                                 .then((result) => {
                                     console.log(result);
                                 });
-                        })
-                        // .then(() => {
-                        //     firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).collection('bankAccounts').doc(accNum.toString())
-                        //         .collection('transactions').add({
-                        //         userID: firebase.auth().currentUser.uid,
-                        //         accountNumber: accNum,
-                        //         transferStatus: ' ',
-                        //         amount: ' ',
-                        //     });
-                        // });
+                        });
+                    // .then(() => {
+                    //     firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).collection('bankAccounts').doc(accNum.toString())
+                    //         .collection('transactions').add({
+                    //         userID: firebase.auth().currentUser.uid,
+                    //         accountNumber: accNum,
+                    //         transferStatus: ' ',
+                    //         amount: ' ',
+                    //     });
+                    // });
                 })
                 .catch(error => {
                     console.log(error);

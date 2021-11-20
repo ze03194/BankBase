@@ -11,6 +11,8 @@ const auth = firebase.auth().currentUser.uid;
 
 
 const SendMoneyScreen = ({navigation, route}) => {
+    // let rUserID = 1;
+
     const accountN = route.params;
     const [cNewBalance, setCNewBalance] = useState(0);
     const [rNewBalance, setRNewBalance] = useState(0);
@@ -23,6 +25,9 @@ const SendMoneyScreen = ({navigation, route}) => {
     const [rUserID, setRUserID] = useState('');
     const [transferredAmount, setTransferredAmount] = useState(0);
 
+    // useEffect(() => {
+    //     getRecipientUser();
+    // }, []);
 
     // useEffect(() => {
     //     getAcctInfo();
@@ -109,78 +114,125 @@ const SendMoneyScreen = ({navigation, route}) => {
         });
 
     const sendButtonHandler = () => {
-        getRecipientUser();
-        updateUsers();
-        updateTransactions();
-
+        getRecipientUser().then(rUserID => {
+                updateUsers();
+                return updateTransactions(rUserID).then(_ => setRUserID(rUserID));
+            },
+        );
     };
 
     const updateUsers = () => {
-        console.log('ridFromUpdateUsers: ' + rUserID);
-        if ((cUserBalance - parseInt(transferredAmount)) > 0) {
-            firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).collection('bankAccounts').doc(accountN.toString())
-                .update({
-                    balance: cUserBalance - parseInt(transferredAmount),
-                })
-                .then(() => {
-                    console.log('Successful update!');
-                });
-        } else {
-            alert('Insufficient funds!');
-        }
-        firebase.firestore().collection('users').doc(rUserID.toString()).collection('bankAccounts').doc(rAccountNum.toString())
-            .update({
-                balance: rUserBalance + parseInt(transferredAmount),
-            })
+        // console.log('ridFromUpdateUsers: ' + rUserID);
+        // if ((cUserBalance - parseInt(transferredAmount)) > 0) {
+        //     firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).collection('bankAccounts').doc(accountN.toString())
+        //         .update({
+        //             balance: cUserBalance - parseInt(transferredAmount),
+        //         })
+        //         .then(() => {
+        //             console.log('Successful update!');
+        //         });
+        // } else {
+        //     alert('Insufficient funds!');
+        // }
+        // firebase.firestore().collection('users').doc(rUserID.toString()).collection('bankAccounts').doc(rAccountNum.toString())
+        //     .update({
+        //         balance: rUserBalance + parseInt(transferredAmount),
+        //     })
+        //     .then(() => {
+        //         console.log('Successful update!');
+        //     });
+        console.log('accountN: ' + accountN);
+        firebase.firestore().collection('bankAccounts').doc(accountN.toString()).update({
+            balance: cUserBalance - parseInt(transferredAmount),
+        })
             .then(() => {
-                console.log('Successful update!');
+                console.log('accountN: ' + accountN);
             });
+
+        firebase.firestore().collection('bankAccounts').doc(rAccountNum.toString()).update({
+            balance: rUserBalance + parseInt(transferredAmount),
+        }).then(() => {
+            console.log('rAccountNum: ' + rAccountNum);
+        });
     };
 
-    const updateTransactions = () => {
-        console.log('ridFromTrans: ' + rUserID);
-        if (rUserID !== undefined) {
-            firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).collection('bankAccounts').doc(accountN.toString())
-                .collection('transactions').add({
-                userID: firebase.auth().currentUser.uid,
-                accountNumber: accountN,
-                transferStatus: 'Sent',
-                amount: transferredAmount,
-            })
-                .then(() => {
-                    console.log('Transaction Updated!');
-                });
-        }
+    const updateTransactions = async (rUserID) => {
+        // console.log('ridFromTrans: ' + rUserID);
+        // if (rUserID !== undefined) {
+        //     firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).collection('bankAccounts').doc(accountN.toString())
+        //         .collection('transactions').add({
+        //         userID: firebase.auth().currentUser.uid,
+        //         accountNumber: accountN,
+        //         transferStatus: 'Sent',
+        //         amount: transferredAmount,
+        //     })
+        //         .then(() => {
+        //             console.log('Transaction Updated!');
+        //         });
+        // }
+        //
+        // if (rUserID !== undefined) {
+        //     firebase.firestore().collection('users').doc(rUserID.toString()).collection('bankAccounts').doc(rAccountNum.toString())
+        //         .collection('transactions').add({
+        //         userID: rUserID,
+        //         accountNumber: rAccountNum,
+        //         transferStatus: 'Received',
+        //         amount: transferredAmount,
+        //     })
+        //         .then(() => {
+        //             console.log('Transaction Updated!');
+        //         });
+        //
+        // }
 
-        if (rUserID !== undefined) {
-            firebase.firestore().collection('users').doc(rUserID.toString()).collection('bankAccounts').doc(rAccountNum.toString())
-                .collection('transactions').add({
-                userID: rUserID,
-                accountNumber: rAccountNum,
-                transferStatus: 'Received',
-                amount: transferredAmount,
-            })
-                .then(() => {
-                    console.log('Transaction Updated!');
-                });
+        // firebase.firestore().collection('bankAccounts').doc(rAccountNum.toString()).get()
+        //     .then(documentSnapshot => {
+        //         setRUserID(documentSnapshot.get('userID'));
+        //     });
 
-        }
+        await firebase.firestore().collection('transactions').doc().set({
+            userID: rUserID,
+            amount: transferredAmount,
+            transferStatus: 'Received',
+        })
+            .then(() => {
+                console.log('Successful Transaction!');
+            });
+
+        await firebase.firestore().collection('transactions').doc().set({
+            userID: firebase.auth().currentUser.uid,
+            amount: transferredAmount,
+            transferStatus: 'Sent',
+        })
+            .then(() => {
+                console.log('Successful Transaction!');
+            });
+
     };
+
+    // const getRecipientUser = () => {
+    //     firebase.firestore().collection('users').get()
+    //         .then(querySnapshot => {
+    //             querySnapshot.forEach(documentSnapshot => {
+    //                 firebase.firestore().collection('users').doc(documentSnapshot.id).collection('bankAccounts').doc(rAccountNum.toString()).get()
+    //                     .then(documentSnapshot => {
+    //                         if (documentSnapshot.get('userID') !== undefined) {
+    //                             setRUserID(documentSnapshot.get('userID'));
+    //                             setRUserBalance(documentSnapshot.get('balance'));
+    //                         }
+    //                     });
+    //                 console.log('rid from recip user: ' + rUserID);
+    //             });
+    //         });
+    //
+    // };
 
     const getRecipientUser = () => {
-        firebase.firestore().collection('users').get()
-            .then(querySnapshot => {
-                querySnapshot.forEach(documentSnapshot => {
-                    firebase.firestore().collection('users').doc(documentSnapshot.id).collection('bankAccounts').doc(rAccountNum.toString()).get()
-                        .then(documentSnapshot => {
-                            if (documentSnapshot.get('userID') !== undefined) {
-                                setRUserID(documentSnapshot.get('userID'));
-                                setRUserBalance(documentSnapshot.get('balance'));
-                            }
-                        });
-                });
+        return firebase.firestore().collection('bankAccounts').doc(rAccountNum.toString()).get()
+            .then(documentSnapshot => {
+                return documentSnapshot.get('userID');
             });
-        console.log('ridFromRecipUser: ' + rUserID);
+
     };
 
 
