@@ -11,6 +11,7 @@ const auth = firebase.auth();
 // const Stack = createNativeStackNavigator();
 
 const LoggedInScreen = ({navigation}) => {
+    const testing = 12321321;
     const [accountNumb, setAccountNumb] = useState(123456789);
     const [user, setUser] = useState({
         emailAddress: '',
@@ -102,10 +103,10 @@ const LoggedInScreen = ({navigation}) => {
                     </View>
                 </View>
                 <View style={styles.bottomNavBar}>
-                    <TouchableOpacity onPress={() => navigation.navigate('SendMoney')}>
+                    <TouchableOpacity onPress={() => navigation.navigate('SendMoney', accountNumb)}>
                         <Text style={{color: 'white'}}>Send Money</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => navigation.navigate('SendMoney')}>
+                    <TouchableOpacity onPress={() => navigation.navigate('SendMoney', accountNumb)}>
                         <Text style={{color: 'white'}}>Request Money</Text>
                     </TouchableOpacity>
                 </View>

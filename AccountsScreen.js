@@ -43,9 +43,6 @@ const AccountsScreen = ({navigation}, user) => {
                 <Image style={styles.logoImg} source={require('../BankBaseMobile/images/BankBaseLogo.png')}/>
             </View>
             <View style={styles.topBarContainer}>
-                {/*<TouchableOpacity onPress={() => navigation.navigate('Home')}>*/}
-                {/*    <Text style={styles.topBarText}>Home</Text>*/}
-                {/*</TouchableOpacity>*/}
                 <TouchableOpacity onPress={() => firebase.auth().signOut()}>
                     <Text style={styles.topBarText}>Log Out</Text>
                 </TouchableOpacity>

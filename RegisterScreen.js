@@ -12,6 +12,7 @@ import '@react-native-firebase/firestore';
 const db = firebase.firestore();
 const auth = firebase.auth();
 const RegisterScreen = (props) => {
+        const accNum = Math.floor(10000000 + Math.random() * 99999999);
 
         const [registration, setRegistration] = useState({
             password: '',
@@ -24,7 +25,8 @@ const RegisterScreen = (props) => {
             state: '',
             zipCode: '',
             securityPin: '',
-            balance: formatMoney(Math.floor(10000 + Math.random() * 99999)),
+            balance: Math.floor(10000 + Math.random() * 99999),
+            // balance: formatMoney(Math.floor(10000 + Math.random() * 99999)),
         });
 
         console.log('balance: ' + formatMoney(registration.balance));
@@ -55,7 +57,6 @@ const RegisterScreen = (props) => {
                             zipCode: registration.zipCode,
                         })
                         .then(() => {
-                            const accNum = Math.floor(10000000 + Math.random() * 99999999);
                             firebase.firestore().collection('users')
                                 .doc(firebase.auth().currentUser.uid)
                                 .collection('bankAccounts').doc(accNum.toString()).set({
@@ -66,7 +67,16 @@ const RegisterScreen = (props) => {
                                 .then((result) => {
                                     console.log(result);
                                 });
-                        });
+                        })
+                        // .then(() => {
+                        //     firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).collection('bankAccounts').doc(accNum.toString())
+                        //         .collection('transactions').add({
+                        //         userID: firebase.auth().currentUser.uid,
+                        //         accountNumber: accNum,
+                        //         transferStatus: ' ',
+                        //         amount: ' ',
+                        //     });
+                        // });
                 })
                 .catch(error => {
                     console.log(error);
