@@ -101,7 +101,8 @@ const LoggedInScreen = ({navigation}) => {
                     </View>
                 </View>
                 <View style={styles.bottomNavBar}>
-                    <TouchableOpacity onPress={() => navigation.navigate('SendMoney', accountNumb)}>
+                    <TouchableOpacity
+                        onPress={() => navigation.navigate('SendMoney', accountNumb)}>
                         <Text style={{color: 'white'}}>Send Money</Text>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => navigation.navigate('SendMoney', accountNumb)}>

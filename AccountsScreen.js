@@ -1,6 +1,6 @@
 /* eslint-disable */
 import React, {useEffect, useState} from 'react';
-import {Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {FlatList, Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {firebase} from '@react-native-firebase/app';
 import '@react-native-firebase/auth';
 import '@react-native-firebase/firestore';
@@ -10,30 +10,49 @@ const db = firebase.firestore();
 const auth = firebase.auth();
 
 const AccountsScreen = ({navigation}, user) => {
-    const [userAccount, setUserAccount] = useState({
-        accountNumber: 123,
-        balance: 0,
-    });
+    const [transactions, setTransactions] = useState([]);
+
+    function formatMoney(number) {
+        return number.toLocaleString('en-US', {style: 'currency', currency: 'USD'});
+    }
 
     useEffect(() => {
-        getAcctInfo();
-        return () => {
-            setUserAccount({});
-        };
-    }, []);
+        const transaction = firebase.firestore().collection('transactions').where('userID', '==', firebase.auth().currentUser.uid)
+            .onSnapshot(querySnapshot => {
+                const transactions = [];
 
-    const getAcctInfo = () => {
-        firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid)
-            .collection('bankAccounts').where('userID', '==', firebase.auth().currentUser.uid)
-            .get()
-            .then(querySnapshot => {
                 querySnapshot.forEach(documentSnapshot => {
-                    setUserAccount({
-                        accountNumber: documentSnapshot.get('accountNumber'),
-                        balance: documentSnapshot.get('balance'),
+                    transactions.push({
+                        ...documentSnapshot.data(),
+                        key: documentSnapshot.id,
                     });
                 });
+                setTransactions(transactions);
             });
+        return () => transactions;
+    }, []);
+
+    // const getTransactions = () => {
+    //     firebase.firestore().collection('transactions').where('userID', '==', firebase.auth().currentUser.uid).get()
+    //         .then(querySnapshot => {
+    //             querySnapshot.forEach(documentSnapshot => {
+    //                 console.log('data1: ' + documentSnapshot.get('transferStatus'));
+    //                 setTransaction({
+    //                     amount: documentSnapshot.get('amount'),
+    //                     transferStatus: documentSnapshot.get('transferStatus'),
+    //                 });
+    //                 transactions.push(transaction);
+    //                 console.log('tes1t: ' + JSON.stringify(transactions));
+    //             });
+    //         });
+    // };
+
+    const getWord = (item) => {
+        if (item === 'Sent') {
+            return 'Recipient: ';
+        }
+
+        return 'Sender';
     };
 
 
@@ -55,28 +74,35 @@ const AccountsScreen = ({navigation}, user) => {
             </View>
             {/*<Text style={styles.welcomeText}>Welcome {user.firstName}</Text>*/}
 
-            <ScrollView contentContainerStyle={styles.scrollContainer}>
-                <View style={styles.testing}>
-                    <View style={styles.testing1}>
-                        <Text style={{color: 'white', alignSelf: 'center', marginTop: 15}}>Recent Transactions</Text>
-                        <View style={{
-                            minWidth: 300,
-                            maxWidth: 300,
-                            minHeight: 150,
-                            maxHeight: 150,
-                            backgroundColor: 'white',
-                            marginTop: 15,
-                            borderLeftWidth: 1,
-                            borderRightWidth: 1,
-                            borderBottomWidth: 1,
-                        }}>
-                            <TouchableOpacity>
-                                <Text>...{userAccount.accountNumber.toString().substring(4, 9)}</Text>
-                            </TouchableOpacity>
-                        </View>
+            {/*<ScrollView contentContainerStyle={styles.scrollContainer}>*/}
+            <View style={styles.testing}>
+                <View style={styles.testing1}>
+                    <Text style={{color: 'white', alignSelf: 'center', marginTop: 15}}>Recent Transactions</Text>
+                    <View style={{
+                        minWidth: 300,
+                        maxWidth: 300,
+                        minHeight: 150,
+                        maxHeight: 150,
+                        backgroundColor: 'white',
+                        marginTop: 15,
+                        borderLeftWidth: 1,
+                        borderRightWidth: 1,
+                        borderBottomWidth: 1,
+                    }}>
+                        <FlatList
+                            data={transactions}
+                            renderItem={({item}) => (
+                                <View style={styles.transactionDisplay}>
+                                    <Text>{item.transferStatus}: {formatMoney(parseInt(item.amount))}</Text>
+                                    <Text>{getWord(item.transferStatus)}: {item.firstName} {item.lastName}</Text>
+                                </View>
+
+
+                            )}/>
                     </View>
                 </View>
-            </ScrollView>
+            </View>
+            {/*</ScrollView>*/}
         </SafeAreaView>
     );
 };
@@ -118,6 +144,10 @@ const styles = StyleSheet.create({
         backgroundColor: '#02295F',
         alignSelf: 'center',
     },
+    transactionDisplay: {
+        borderWidth: 1,
+    },
+
 });
 
 export default AccountsScreen;

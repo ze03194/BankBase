@@ -11,107 +11,28 @@ const auth = firebase.auth().currentUser.uid;
 
 
 const SendMoneyScreen = ({navigation, route}) => {
-    // let rUserID = 1;
 
     const accountN = route.params;
-    const [cNewBalance, setCNewBalance] = useState(0);
-    const [rNewBalance, setRNewBalance] = useState(0);
 
+    // const [cNewBalance, setCNewBalance] = useState(0);
+    // const [rNewBalance, setRNewBalance] = useState(0);
+    //
+    //
+    // const [cUserBalance, setCUserBalance] = useState(0);
+    // const [rUserBalance, setRUserBalance] = useState(0);
 
-    const [cUserBalance, setCUserBalance] = useState(0);
-    const [rUserBalance, setRUserBalance] = useState(0);
-
+    const [recipientFirstName, setRecipientFirstName] = useState('');
+    const [recipientLastName, setRecipientLastName] = useState('');
+    // const [currentFirstName, setCurrentFirstName] = useState('');
+    // const [currentLastName, setCurrentLastName] = useState('');
     const [rAccountNum, setRAccountNum] = useState(0);
     const [rUserID, setRUserID] = useState('');
     const [transferredAmount, setTransferredAmount] = useState(0);
 
-    // useEffect(() => {
-    //     getRecipientUser();
-    // }, []);
-
-    // useEffect(() => {
-    //     getAcctInfo();
-    //     return () => {
-    //         setTransferAccount({});
-    //     };
-    // }, []);
-    //
-    // const getAcctInfo = () => {
-    //     firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid)
-    //         .collection('bankAccounts').where('userID', '==', firebase.auth().currentUser.uid)
-    //         .get()
-    //         .then(querySnapshot => {
-    //             querySnapshot.forEach(documentSnapshot => {
-    //                 setTransferAccount({
-    //                     accountNumber: documentSnapshot.get('accountNumber'),
-    //                     balance: documentSnapshot.get('balance'),
-    //                 });
-    //             });
-    //         });
-    //     firebase.firestore().collection('users').get()
-    //         .then(querySnapshot => {
-    //
-    //         })
-    // };
-
-    // useEffect(() => {
-    //     return () => {
-    //         setCurrentUser({});
-    //         setRecipientUser({});
-    //     };
-    // }, []);
-
-    // const sendButtonHandler = () => {
-    //     firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).collection('bankAccounts').doc(accountN.toString()).get()
-    //         .then(documentSnapshot => {
-    //             setCurrentUser({
-    //                 balance: documentSnapshot.get('balance'),
-    //             });
-    //         });
-    //
-    //
-    //     firebase.firestore().collection('users').get()
-    //         .then(querySnapshot => {
-    //             querySnapshot.forEach(documentSnapshot => {
-    //                 firebase.firestore().collection('users').doc(documentSnapshot.id).collection('bankAccounts').doc(rAccount).get()
-    //                     .then(documentSnapshot => {
-    //                         if (documentSnapshot.get('userID') !== undefined) {
-    //                             setRecipientUser({
-    //                                 userID: documentSnapshot.get('userID'),
-    //                                 balance: documentSnapshot.get('balance'),
-    //                             });
-    //                         }
-    //                         newBalance = recipientUser.balance - 200;
-    //                         console.log('test1: ' + recipientUser.balance);
-    //                         console.log('newBalance: ' + newBalance);
-    //
-    //                     });
-    //             });
-    //         });
-    //
-    //     firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).collection('bankAccounts').doc(accountN.toString())
-    //         .update({
-    //             balance: currentUser.balance - currentUser.amountSent,
-    //         })
-    //         .then(() => {
-    //             console.log('successful update');
-    //         });
-    //     console.log('test2: ' + rAccount);
-    //     // firebase.firestore().collection('users').doc(recipientUser.userID).collection('bankAccounts').doc(recipientUser.accountNumber)
-    //     //     .update({
-    //     //         balance: recipientUser.balance + recipientUser.amountReceived,
-    //     //     })
-    //     //     .then(() => {
-    //     //         console.log('successful update');
-    //     //     });
-    //
-    //
-    // };
-
-    firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).collection('bankAccounts').doc(accountN.toString()).get()
-        .then(documentSnapshot => {
-            setCUserBalance(documentSnapshot.get('balance'));
-        });
+    // firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).collection('bankAccounts').doc(accountN.toString()).get()
+    //     .then(documentSnapshot => {
+    //         setCUserBalance(documentSnapshot.get('balance'));
+    //     });
 
     const sendButtonHandler = () => {
         getRecipientUser().then(rUserID => {
@@ -123,84 +44,46 @@ const SendMoneyScreen = ({navigation, route}) => {
 
     const updateUsers = () => {
         const db = firebase.firestore();
-        const currentUser = firebase.firestore().collection('bankAccounts').doc(accountN.toString());
-        const recipientUser = firebase.firestore().collection('bankAccounts').doc(rAccountNum.toString());
-
+        const currentAccount = firebase.firestore().collection('bankAccounts').doc(accountN.toString());
+        const recipientAccount = firebase.firestore().collection('bankAccounts').doc(rAccountNum.toString());
 
         try {
             db.runTransaction(async t => {
-                const currentDoc = await t.get(currentUser);
+                const currentDoc = await t.get(currentAccount);
                 const newCurrentBalance = currentDoc.data().balance - parseInt(transferredAmount);
                 if (newCurrentBalance > 0) {
-                    t.update(currentUser, {balance: newCurrentBalance});
+                    t.update(currentAccount, {balance: newCurrentBalance});
                 } else {
                     alert('Insufficient funds!');
                 }
-                const recipientDoc = await t.get(recipientUser);
+                const recipientDoc = await t.get(recipientAccount);
                 const newRecipientBalance = recipientDoc.data().balance + parseInt(transferredAmount);
-                t.update(recipientUser, {balance: newRecipientBalance});
+                t.update(recipientAccount, {balance: newRecipientBalance});
 
-                console.log('Transaction Success! ');
+                alert('Transaction Successful!');
             });
         } catch (e) {
-            console.log('Transaction failure: ', e);
+            alert('Transaction Failure', e);
         }
-
-
     };
 
-    const updateTransactions = async (rUserID) => {
-        // console.log('ridFromTrans: ' + rUserID);
-        // if (rUserID !== undefined) {
-        //     firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).collection('bankAccounts').doc(accountN.toString())
-        //         .collection('transactions').add({
-        //         userID: firebase.auth().currentUser.uid,
-        //         accountNumber: accountN,
-        //         transferStatus: 'Sent',
-        //         amount: transferredAmount,
-        //     })
-        //         .then(() => {
-        //             console.log('Transaction Updated!');
-        //         });
-        // }
-        //
-        // if (rUserID !== undefined) {
-        //     firebase.firestore().collection('users').doc(rUserID.toString()).collection('bankAccounts').doc(rAccountNum.toString())
-        //         .collection('transactions').add({
-        //         userID: rUserID,
-        //         accountNumber: rAccountNum,
-        //         transferStatus: 'Received',
-        //         amount: transferredAmount,
-        //     })
-        //         .then(() => {
-        //             console.log('Transaction Updated!');
-        //         });
-        //
-        // }
-
-        // firebase.firestore().collection('bankAccounts').doc(rAccountNum.toString()).get()
-        //     .then(documentSnapshot => {
-        //         setRUserID(documentSnapshot.get('userID'));
-        //     });
-
-        // await firebase.firestore().collection('transactions').doc().set({
-        //     userID: rUserID,
-        //     amount: transferredAmount,
-        //     transferStatus: 'Received',
-        // })
-        //     .then(() => {
-        //         console.log('Successful Transaction!');
-        //     });
-        //
-        // await firebase.firestore().collection('transactions').doc().set({
-        //     userID: firebase.auth().currentUser.uid,
-        //     amount: transferredAmount,
-        //     transferStatus: 'Sent',
-        // })
-        //     .then(() => {
-        //         console.log('Successful Transaction!');
-        //     });
+    const updateTransactions = async (rUserID, currentFirstName, currentLastName) => {
         const batch = firebase.firestore().batch();
+        const db = firebase.firestore();
+        const currentUser = db.collection('users').doc(firebase.auth().currentUser.uid);
+
+
+        db.runTransaction(async t => {
+            const currentDoc = await t.get(currentUser);
+
+            const currentFirstName = currentDoc.data().firstName;
+            const currentLastName = currentDoc.data().lastName;
+            // setCurrentFirstName(currentDoc.data().firstName);
+            // setCurrentLastName(currentDoc.data().lastName);
+            console.log('firstName: ' + currentFirstName);
+
+        });
+
         const recipientTransaction = firebase.firestore().collection('transactions').doc();
         const currentTransaction = firebase.firestore().collection('transactions').doc();
 
@@ -208,35 +91,24 @@ const SendMoneyScreen = ({navigation, route}) => {
             userID: rUserID,
             amount: transferredAmount,
             transferStatus: 'Received',
+            receivedFrom: accountN,
+            // firstName: currentFirstName,
+            // lastName: currentLastName,
         });
 
         batch.set(currentTransaction, {
             userID: firebase.auth().currentUser.uid,
             amount: transferredAmount,
             transferStatus: 'Sent',
+            sentTo: rAccountNum,
+            firstName: recipientFirstName,
+            lastName: recipientLastName,
         });
 
         await batch.commit();
 
 
     };
-
-    // const getRecipientUser = () => {
-    //     firebase.firestore().collection('users').get()
-    //         .then(querySnapshot => {
-    //             querySnapshot.forEach(documentSnapshot => {
-    //                 firebase.firestore().collection('users').doc(documentSnapshot.id).collection('bankAccounts').doc(rAccountNum.toString()).get()
-    //                     .then(documentSnapshot => {
-    //                         if (documentSnapshot.get('userID') !== undefined) {
-    //                             setRUserID(documentSnapshot.get('userID'));
-    //                             setRUserBalance(documentSnapshot.get('balance'));
-    //                         }
-    //                     });
-    //                 console.log('rid from recip user: ' + rUserID);
-    //             });
-    //         });
-    //
-    // };
 
     const getRecipientUser = () => {
         return firebase.firestore().collection('bankAccounts').doc(rAccountNum.toString()).get()
@@ -245,7 +117,6 @@ const SendMoneyScreen = ({navigation, route}) => {
             });
 
     };
-
 
     return (
         <SafeAreaView style={styles.mainContainer}>
@@ -268,10 +139,12 @@ const SendMoneyScreen = ({navigation, route}) => {
                     <TextInput
                         placeholder={'First Name'}
                         style={styles.inputText}
+                        onChangeText={text => setRecipientFirstName(text)}
                     />
                     <TextInput
                         placeholder={'Last Name'}
                         style={styles.inputText}
+                        onChangeText={text => setRecipientLastName(text)}
                     />
                     <TextInput
                         placeholder={'Account Number'}
