@@ -122,38 +122,31 @@ const SendMoneyScreen = ({navigation, route}) => {
     };
 
     const updateUsers = () => {
-        // console.log('ridFromUpdateUsers: ' + rUserID);
-        // if ((cUserBalance - parseInt(transferredAmount)) > 0) {
-        //     firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).collection('bankAccounts').doc(accountN.toString())
-        //         .update({
-        //             balance: cUserBalance - parseInt(transferredAmount),
-        //         })
-        //         .then(() => {
-        //             console.log('Successful update!');
-        //         });
-        // } else {
-        //     alert('Insufficient funds!');
-        // }
-        // firebase.firestore().collection('users').doc(rUserID.toString()).collection('bankAccounts').doc(rAccountNum.toString())
-        //     .update({
-        //         balance: rUserBalance + parseInt(transferredAmount),
-        //     })
-        //     .then(() => {
-        //         console.log('Successful update!');
-        //     });
-        console.log('accountN: ' + accountN);
-        firebase.firestore().collection('bankAccounts').doc(accountN.toString()).update({
-            balance: cUserBalance - parseInt(transferredAmount),
-        })
-            .then(() => {
-                console.log('accountN: ' + accountN);
-            });
+        const db = firebase.firestore();
+        const currentUser = firebase.firestore().collection('bankAccounts').doc(accountN.toString());
+        const recipientUser = firebase.firestore().collection('bankAccounts').doc(rAccountNum.toString());
 
-        firebase.firestore().collection('bankAccounts').doc(rAccountNum.toString()).update({
-            balance: rUserBalance + parseInt(transferredAmount),
-        }).then(() => {
-            console.log('rAccountNum: ' + rAccountNum);
-        });
+
+        try {
+            db.runTransaction(async t => {
+                const currentDoc = await t.get(currentUser);
+                const newCurrentBalance = currentDoc.data().balance - parseInt(transferredAmount);
+                if (newCurrentBalance > 0) {
+                    t.update(currentUser, {balance: newCurrentBalance});
+                } else {
+                    alert('Insufficient funds!');
+                }
+                const recipientDoc = await t.get(recipientUser);
+                const newRecipientBalance = recipientDoc.data().balance + parseInt(transferredAmount);
+                t.update(recipientUser, {balance: newRecipientBalance});
+
+                console.log('Transaction Success! ');
+            });
+        } catch (e) {
+            console.log('Transaction failure: ', e);
+        }
+
+
     };
 
     const updateTransactions = async (rUserID) => {
@@ -190,23 +183,41 @@ const SendMoneyScreen = ({navigation, route}) => {
         //         setRUserID(documentSnapshot.get('userID'));
         //     });
 
-        await firebase.firestore().collection('transactions').doc().set({
+        // await firebase.firestore().collection('transactions').doc().set({
+        //     userID: rUserID,
+        //     amount: transferredAmount,
+        //     transferStatus: 'Received',
+        // })
+        //     .then(() => {
+        //         console.log('Successful Transaction!');
+        //     });
+        //
+        // await firebase.firestore().collection('transactions').doc().set({
+        //     userID: firebase.auth().currentUser.uid,
+        //     amount: transferredAmount,
+        //     transferStatus: 'Sent',
+        // })
+        //     .then(() => {
+        //         console.log('Successful Transaction!');
+        //     });
+        const batch = firebase.firestore().batch();
+        const recipientTransaction = firebase.firestore().collection('transactions').doc();
+        const currentTransaction = firebase.firestore().collection('transactions').doc();
+
+        batch.set(recipientTransaction, {
             userID: rUserID,
             amount: transferredAmount,
             transferStatus: 'Received',
-        })
-            .then(() => {
-                console.log('Successful Transaction!');
-            });
+        });
 
-        await firebase.firestore().collection('transactions').doc().set({
+        batch.set(currentTransaction, {
             userID: firebase.auth().currentUser.uid,
             amount: transferredAmount,
             transferStatus: 'Sent',
-        })
-            .then(() => {
-                console.log('Successful Transaction!');
-            });
+        });
+
+        await batch.commit();
+
 
     };
 
@@ -265,13 +276,11 @@ const SendMoneyScreen = ({navigation, route}) => {
                     <TextInput
                         placeholder={'Account Number'}
                         style={styles.inputText}
-                        value={rAccountNum}
                         onChangeText={text => setRAccountNum(text)}
                     />
                     <TextInput
                         placeholder={'Amount to Send'}
                         style={styles.inputText}
-                        value={transferredAmount}
                         onChangeText={text => setTransferredAmount(text)}
                     />
                     <TouchableOpacity style={styles.registerButton} onPress={sendButtonHandler}>
