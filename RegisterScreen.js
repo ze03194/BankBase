@@ -29,12 +29,6 @@ const RegisterScreen = (props) => {
             // balance: formatMoney(Math.floor(10000 + Math.random() * 99999)),
         });
 
-        console.log('balance: ' + formatMoney(registration.balance));
-
-        function formatMoney(number) {
-            return number.toLocaleString('en-US', {style: 'currency', currency: 'USD'});
-        }
-
         const changeTextInput = (key, value) => {
             setRegistration({
                 ...registration,
@@ -201,4 +195,4 @@ const styles = StyleSheet.create({
 });
 
 export default RegisterScreen;
-;
+

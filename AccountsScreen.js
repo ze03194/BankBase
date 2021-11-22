@@ -9,15 +9,23 @@ import SafeAreaView from 'react-native/Libraries/Components/SafeAreaView/SafeAre
 const db = firebase.firestore();
 const auth = firebase.auth();
 
-const AccountsScreen = ({navigation}, user) => {
+const AccountsScreen = ({navigation, route}) => {
+    const {accountNumb} = route.params;
     const [transactions, setTransactions] = useState([]);
+    const [balance, setBalance] = useState(0);
+
+    console.log('acctNumb: ' + accountNumb);
 
     function formatMoney(number) {
         return number.toLocaleString('en-US', {style: 'currency', currency: 'USD'});
     }
 
+
     useEffect(() => {
-        const transaction = firebase.firestore().collection('transactions').where('userID', '==', firebase.auth().currentUser.uid)
+        getBalance().then(r => {
+            console.log('r:' + r);
+        });
+        const transaction = db.collection('transactions').where('userID', '==', auth.currentUser.uid)
             .onSnapshot(querySnapshot => {
                 const transactions = [];
 
@@ -32,27 +40,25 @@ const AccountsScreen = ({navigation}, user) => {
         return () => transactions;
     }, []);
 
-    // const getTransactions = () => {
-    //     firebase.firestore().collection('transactions').where('userID', '==', firebase.auth().currentUser.uid).get()
-    //         .then(querySnapshot => {
-    //             querySnapshot.forEach(documentSnapshot => {
-    //                 console.log('data1: ' + documentSnapshot.get('transferStatus'));
-    //                 setTransaction({
-    //                     amount: documentSnapshot.get('amount'),
-    //                     transferStatus: documentSnapshot.get('transferStatus'),
-    //                 });
-    //                 transactions.push(transaction);
-    //                 console.log('tes1t: ' + JSON.stringify(transactions));
-    //             });
-    //         });
-    // };
 
     const getWord = (item) => {
         if (item === 'Sent') {
-            return 'Recipient: ';
+            return 'Recipient ';
         }
-
         return 'Sender';
+    };
+
+    const getBalance = async () => {
+        const balanceRef = db.collection('bankAccounts').doc(accountNumb.toString());
+
+        try {
+            await db.runTransaction(async (t) => {
+                const doc = await t.get(balanceRef);
+                setBalance(doc.data().balance);
+            });
+        } catch (e) {
+            console.log(e);
+        }
     };
 
 
@@ -76,6 +82,8 @@ const AccountsScreen = ({navigation}, user) => {
 
             {/*<ScrollView contentContainerStyle={styles.scrollContainer}>*/}
             <View style={styles.testing}>
+                <Text style={styles.accountBalanceText}>{formatMoney(parseInt(balance))}</Text>
+
                 <View style={styles.testing1}>
                     <Text style={{color: 'white', alignSelf: 'center', marginTop: 15}}>Recent Transactions</Text>
                     <View style={{
@@ -89,18 +97,22 @@ const AccountsScreen = ({navigation}, user) => {
                         borderRightWidth: 1,
                         borderBottomWidth: 1,
                     }}>
+
                         <FlatList
                             data={transactions}
                             renderItem={({item}) => (
                                 <View style={styles.transactionDisplay}>
-                                    <Text>{item.transferStatus}: {formatMoney(parseInt(item.amount))}</Text>
-                                    <Text>{getWord(item.transferStatus)}: {item.firstName} {item.lastName}</Text>
+                                    <Text
+                                        style={styles.transactionText}>{item.transferStatus}: {formatMoney(parseInt(item.amount))}</Text>
+                                    <Text
+                                        style={styles.transactionText}>{getWord(item.transferStatus)}: {item.firstName} {item.lastName} </Text>
+                                    <Text
+                                        style={styles.transactionText}>Balance: {formatMoney(parseInt(item.balance))}</Text>
                                 </View>
-
-
                             )}/>
                     </View>
                 </View>
+
             </View>
             {/*</ScrollView>*/}
         </SafeAreaView>
@@ -126,6 +138,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginTop: 10,
+        marginBottom: 10,
+        marginHorizontal: 10,
     },
     logoImg: {
         width: 425,
@@ -145,8 +159,20 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
     },
     transactionDisplay: {
-        borderWidth: 1,
+        flex: 1,
+        borderTopWidth: 1.5,
+        minHeight: 75,
+        maxHeight: 80,
     },
+    transactionText: {
+        color: 'black',
+        fontWeight: 'bold',
+    },
+    accountBalanceText: {
+        color: 'black',
+        fontWeight: 'bold',
+    },
+
 
 });
 

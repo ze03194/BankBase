@@ -6,115 +6,88 @@ import {firebase} from '@react-native-firebase/app';
 import '@react-native-firebase/auth';
 import '@react-native-firebase/firestore';
 
-const db = firebase.firestore().collection('users');
-const auth = firebase.auth().currentUser.uid;
+const db = firebase.firestore();
+const auth = firebase.auth();
 
 
 const SendMoneyScreen = ({navigation, route}) => {
 
-    const accountN = route.params;
+    const {accountNumb} = route.params;
+    const {currentFirstName} = route.params;
+    const {currentLastName} = route.params;
 
-    // const [cNewBalance, setCNewBalance] = useState(0);
-    // const [rNewBalance, setRNewBalance] = useState(0);
-    //
-    //
-    // const [cUserBalance, setCUserBalance] = useState(0);
-    // const [rUserBalance, setRUserBalance] = useState(0);
 
     const [recipientFirstName, setRecipientFirstName] = useState('');
     const [recipientLastName, setRecipientLastName] = useState('');
-    // const [currentFirstName, setCurrentFirstName] = useState('');
-    // const [currentLastName, setCurrentLastName] = useState('');
+
     const [rAccountNum, setRAccountNum] = useState(0);
     const [rUserID, setRUserID] = useState('');
     const [transferredAmount, setTransferredAmount] = useState(0);
 
-    // firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).collection('bankAccounts').doc(accountN.toString()).get()
-    //     .then(documentSnapshot => {
-    //         setCUserBalance(documentSnapshot.get('balance'));
-    //     });
 
     const sendButtonHandler = () => {
         getRecipientUser().then(rUserID => {
-                updateUsers();
                 return updateTransactions(rUserID).then(_ => setRUserID(rUserID));
             },
         );
     };
 
-    const updateUsers = () => {
-        const db = firebase.firestore();
-        const currentAccount = firebase.firestore().collection('bankAccounts').doc(accountN.toString());
-        const recipientAccount = firebase.firestore().collection('bankAccounts').doc(rAccountNum.toString());
+    const updateTransactions = async (rUserID) => {
+
+        const currentAccount = db.collection('bankAccounts').doc(accountNumb.toString());
+        const recipientAccount = db.collection('bankAccounts').doc(rAccountNum.toString());
+        const recipientTransaction = db.collection('transactions').doc();
+        const currentTransaction = db.collection('transactions').doc();
 
         try {
             db.runTransaction(async t => {
                 const currentDoc = await t.get(currentAccount);
                 const newCurrentBalance = currentDoc.data().balance - parseInt(transferredAmount);
+
                 if (newCurrentBalance > 0) {
                     t.update(currentAccount, {balance: newCurrentBalance});
+                    t.set(currentTransaction, {
+                        userID: auth.currentUser.uid,
+                        amount: transferredAmount,
+                        transferStatus: 'Sent',
+                        sentTo: rAccountNum,
+                        firstName: recipientFirstName,
+                        lastName: recipientLastName,
+                        balance: newCurrentBalance,
+                    });
+
+                    const recipientDoc = await t.get(recipientAccount);
+                    const newRecipientBalance = recipientDoc.data().balance + parseInt(transferredAmount);
+                    t.update(recipientAccount, {balance: newRecipientBalance});
+                    t.set(recipientTransaction, {
+                        userID: rUserID,
+                        amount: transferredAmount,
+                        transferStatus: 'Received',
+                        receivedFrom: accountNumb,
+                        firstName: currentFirstName,
+                        lastName: currentLastName,
+                        balance: newRecipientBalance,
+                    });
+
                 } else {
                     alert('Insufficient funds!');
                 }
-                const recipientDoc = await t.get(recipientAccount);
-                const newRecipientBalance = recipientDoc.data().balance + parseInt(transferredAmount);
-                t.update(recipientAccount, {balance: newRecipientBalance});
 
                 alert('Transaction Successful!');
             });
         } catch (e) {
             alert('Transaction Failure', e);
         }
-    };
-
-    const updateTransactions = async (rUserID, currentFirstName, currentLastName) => {
-        const batch = firebase.firestore().batch();
-        const db = firebase.firestore();
-        const currentUser = db.collection('users').doc(firebase.auth().currentUser.uid);
-
-
-        db.runTransaction(async t => {
-            const currentDoc = await t.get(currentUser);
-
-            const currentFirstName = currentDoc.data().firstName;
-            const currentLastName = currentDoc.data().lastName;
-            // setCurrentFirstName(currentDoc.data().firstName);
-            // setCurrentLastName(currentDoc.data().lastName);
-            console.log('firstName: ' + currentFirstName);
-
-        });
-
-        const recipientTransaction = firebase.firestore().collection('transactions').doc();
-        const currentTransaction = firebase.firestore().collection('transactions').doc();
-
-        batch.set(recipientTransaction, {
-            userID: rUserID,
-            amount: transferredAmount,
-            transferStatus: 'Received',
-            receivedFrom: accountN,
-            // firstName: currentFirstName,
-            // lastName: currentLastName,
-        });
-
-        batch.set(currentTransaction, {
-            userID: firebase.auth().currentUser.uid,
-            amount: transferredAmount,
-            transferStatus: 'Sent',
-            sentTo: rAccountNum,
-            firstName: recipientFirstName,
-            lastName: recipientLastName,
-        });
-
-        await batch.commit();
-
 
     };
+
 
     const getRecipientUser = () => {
-        return firebase.firestore().collection('bankAccounts').doc(rAccountNum.toString()).get()
+        return db.collection('bankAccounts').doc(rAccountNum.toString()).get()
             .then(documentSnapshot => {
                 return documentSnapshot.get('userID');
             });
+
 
     };
 

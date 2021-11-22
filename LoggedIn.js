@@ -11,7 +11,6 @@ const auth = firebase.auth();
 // const Stack = createNativeStackNavigator();
 
 const LoggedInScreen = ({navigation}) => {
-    const testing = 12321321;
     const [accountNumb, setAccountNumb] = useState(123456789);
     const [user, setUser] = useState({
         emailAddress: '',
@@ -25,6 +24,22 @@ const LoggedInScreen = ({navigation}) => {
         accountNumber: 12345678901,
     });
 
+    // const sendButtonHandler = () => {
+    //     getRecipientUser().then(rUserID => {
+    //             return updateTransactions(rUserID).then(_ => setRUserID(rUserID));
+    //         },
+    //     );
+    // };
+
+
+    // useEffect(() => {
+    //     getUsers();
+    //
+    //     return () => {
+    //         setUser({});
+    //     };
+    // }, []);
+
     useEffect(() => {
         getUsers();
         return () => {
@@ -32,33 +47,56 @@ const LoggedInScreen = ({navigation}) => {
         };
     }, []);
 
-    const getUsers = () => {
-        firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).get()
-            .then(documentSnapshot => {
+    const getUsers = async () => {
+        // firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).get()
+        //     .then(documentSnapshot => {
+        //         setUser({
+        //             firstName: documentSnapshot.get('firstName'),
+        //             lastName: documentSnapshot.get('lastName'),
+        //             address1: documentSnapshot.get('address1'),
+        //             address2: documentSnapshot.get('address2'),
+        //             city: documentSnapshot.get('city'),
+        //             state: documentSnapshot.get('state'),
+        //             zipCode: documentSnapshot.get('zipCode'),
+        //             emailAddress: documentSnapshot.get('emailAddress'),
+        //             // accountNumber: documentSnapshot.get('accountNumber'),
+        //             accountNumber: firebase.firestore().collection('bankAccounts').where('userID', '==', firebase.auth().currentUser.uid).get()
+        //                 .then(querySnapshot => {
+        //                     querySnapshot.forEach(documentSnapshot => {
+        //                         setAccountNumb(documentSnapshot.get('accountNumber'));
+        //                     });
+        //                 }),
+        //         });
+        //
+        //     })
+
+        const userRef = db.collection('users').doc(auth.currentUser.uid);
+        try {
+            await db.runTransaction(async (t) => {
+                const doc = await t.get(userRef);
                 setUser({
-                    firstName: documentSnapshot.get('firstName'),
-                    lastName: documentSnapshot.get('lastName'),
-                    address1: documentSnapshot.get('address1'),
-                    address2: documentSnapshot.get('address2'),
-                    city: documentSnapshot.get('city'),
-                    state: documentSnapshot.get('state'),
-                    zipCode: documentSnapshot.get('zipCode'),
-                    emailAddress: documentSnapshot.get('emailAddress'),
-                    // accountNumber: documentSnapshot.get('accountNumber'),
-                    accountNumber: firebase.firestore().collection('bankAccounts').where('userID', '==', firebase.auth().currentUser.uid).get()
+                    firstName: doc.data().firstName,
+                    lastName: doc.data().lastName,
+                    address1: doc.data().address1,
+                    address2: doc.data().address2,
+                    city: doc.data().city,
+                    state: doc.data().state,
+                    zipCode: doc.data().zipCode,
+                    emailAddress: doc.data().emailAddress,
+                    accountNumber: db.collection('bankAccounts').where('userID', '==', auth.currentUser.uid).get()
                         .then(querySnapshot => {
                             querySnapshot.forEach(documentSnapshot => {
                                 setAccountNumb(documentSnapshot.get('accountNumber'));
                             });
                         }),
                 });
+            });
+        } catch (e) {
+            console.log(e);
+        }
 
-            })
-            .catch((error => {
-                console.log(error);
-            }));
+
     };
-    console.log('acct#1: ', accountNumb);
 
     return (
 
@@ -74,7 +112,7 @@ const LoggedInScreen = ({navigation}) => {
                     <Text style={styles.topBarText}>Contact Us</Text>
                 </TouchableOpacity>
             </View>
-            <Text style={styles.welcomeText}>Welcome {user.firstName}</Text>
+            <Text style={styles.welcomeText}>Welcome, {user.firstName}!</Text>
 
             <ScrollView contentContainerStyle={styles.scrollContainer}>
                 <View style={styles.accountBoxContainer}>
@@ -92,7 +130,8 @@ const LoggedInScreen = ({navigation}) => {
                             borderBottomWidth: 1,
                         }}>
                             <ScrollView>
-                                <TouchableOpacity onPress={() => navigation.navigate('Accounts')}>
+                                <TouchableOpacity
+                                    onPress={() => navigation.navigate('Accounts', {accountNumb: accountNumb})}>
                                     <Text>...{accountNumb.toString().substring(4)}</Text>
                                 </TouchableOpacity>
                             </ScrollView>
@@ -102,12 +141,16 @@ const LoggedInScreen = ({navigation}) => {
                 </View>
                 <View style={styles.bottomNavBar}>
                     <TouchableOpacity
-                        onPress={() => navigation.navigate('SendMoney', accountNumb)}>
+                        onPress={() => navigation.navigate('SendMoney', {
+                            accountNumb: accountNumb,
+                            currentFirstName: user.firstName,
+                            currentLastName: user.lastName,
+                        })}>
                         <Text style={{color: 'white'}}>Send Money</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => navigation.navigate('SendMoney', accountNumb)}>
-                        <Text style={{color: 'white'}}>Request Money</Text>
-                    </TouchableOpacity>
+                    {/*<TouchableOpacity onPress={() => navigation.navigate('SendMoney', accountNumb)}>*/}
+                    {/*    <Text style={{color: 'white'}}>Request Money</Text>*/}
+                    {/*</TouchableOpacity>*/}
                 </View>
             </ScrollView>
         </SafeAreaView>
@@ -123,7 +166,7 @@ const styles = StyleSheet.create({
     welcomeText: {
         color: 'white',
         marginTop: 20,
-        marginLeft: 15,
+        marginLeft: 10,
         fontSize: 25,
     },
     topBarText: {
@@ -134,6 +177,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginTop: 10,
+        marginHorizontal: 10,
     },
     logoImg: {
         width: 425,
