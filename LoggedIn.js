@@ -12,6 +12,7 @@ const auth = firebase.auth();
 
 const LoggedInScreen = ({navigation}) => {
     const [accountNumb, setAccountNumb] = useState(123456789);
+    const [retrieved, setRetrieved] = useState(false);
     const [user, setUser] = useState({
         emailAddress: '',
         firstName: '',
@@ -41,38 +42,21 @@ const LoggedInScreen = ({navigation}) => {
     // }, []);
 
     useEffect(() => {
+
+        // getUsers();
         getUsers();
+        // console.log('te1st: ' + JSON.stringify(currUser));
+        // getUsers();
         return () => {
             setUser({});
         };
-    }, []);
+    }, [retrieved]);
 
     const getUsers = async () => {
-        // firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).get()
-        //     .then(documentSnapshot => {
-        //         setUser({
-        //             firstName: documentSnapshot.get('firstName'),
-        //             lastName: documentSnapshot.get('lastName'),
-        //             address1: documentSnapshot.get('address1'),
-        //             address2: documentSnapshot.get('address2'),
-        //             city: documentSnapshot.get('city'),
-        //             state: documentSnapshot.get('state'),
-        //             zipCode: documentSnapshot.get('zipCode'),
-        //             emailAddress: documentSnapshot.get('emailAddress'),
-        //             // accountNumber: documentSnapshot.get('accountNumber'),
-        //             accountNumber: firebase.firestore().collection('bankAccounts').where('userID', '==', firebase.auth().currentUser.uid).get()
-        //                 .then(querySnapshot => {
-        //                     querySnapshot.forEach(documentSnapshot => {
-        //                         setAccountNumb(documentSnapshot.get('accountNumber'));
-        //                     });
-        //                 }),
-        //         });
-        //
-        //     })
 
         const userRef = db.collection('users').doc(auth.currentUser.uid);
         try {
-            await db.runTransaction(async (t) => {
+            return await db.runTransaction(async (t) => {
                 const doc = await t.get(userRef);
                 setUser({
                     firstName: doc.data().firstName,
@@ -90,7 +74,10 @@ const LoggedInScreen = ({navigation}) => {
                             });
                         }),
                 });
+                setRetrieved(true);
             });
+
+
         } catch (e) {
             console.log(e);
         }
@@ -104,14 +91,7 @@ const LoggedInScreen = ({navigation}) => {
             <View style={styles.logoContainer}>
                 <Image style={styles.logoImg} source={require('../BankBaseMobile/images/BankBaseLogo.png')}/>
             </View>
-            <View style={styles.topBarContainer}>
-                <TouchableOpacity onPress={() => firebase.auth().signOut()}>
-                    <Text style={styles.topBarText}>Log Out</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => navigation.navigate('Home')}>
-                    <Text style={styles.topBarText}>Contact Us</Text>
-                </TouchableOpacity>
-            </View>
+
             <Text style={styles.welcomeText}>Welcome, {user.firstName}!</Text>
 
             <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -153,6 +133,14 @@ const LoggedInScreen = ({navigation}) => {
                     {/*</TouchableOpacity>*/}
                 </View>
             </ScrollView>
+            <View style={styles.bottomBarContainer}>
+                <TouchableOpacity onPress={() => firebase.auth().signOut()}>
+                    <Text style={styles.bottomBarText}>Log Out</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+                    <Text style={styles.bottomBarText}>Contact Us</Text>
+                </TouchableOpacity>
+            </View>
         </SafeAreaView>
     );
 };
@@ -169,14 +157,14 @@ const styles = StyleSheet.create({
         marginLeft: 10,
         fontSize: 25,
     },
-    topBarText: {
+    bottomBarText: {
         color: 'white',
         fontSize: 18,
     },
-    topBarContainer: {
+    bottomBarContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginTop: 10,
+        marginBottom: 10,
         marginHorizontal: 10,
     },
     logoImg: {

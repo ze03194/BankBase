@@ -22,9 +22,7 @@ const AccountsScreen = ({navigation, route}) => {
 
 
     useEffect(() => {
-        getBalance().then(r => {
-            console.log('r:' + r);
-        });
+        getBalance();
         const transaction = db.collection('transactions').where('userID', '==', auth.currentUser.uid)
             .onSnapshot(querySnapshot => {
                 const transactions = [];
@@ -67,17 +65,7 @@ const AccountsScreen = ({navigation, route}) => {
             <View style={styles.logoContainer}>
                 <Image style={styles.logoImg} source={require('../BankBaseMobile/images/BankBaseLogo.png')}/>
             </View>
-            <View style={styles.topBarContainer}>
-                <TouchableOpacity onPress={() => firebase.auth().signOut()}>
-                    <Text style={styles.topBarText}>Log Out</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => navigation.navigate('Home')}>
-                    <Text style={styles.topBarText}>Contact Us</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => navigation.navigate('LoggedIn')}>
-                    <Text style={styles.topBarText}>Portal</Text>
-                </TouchableOpacity>
-            </View>
+
             {/*<Text style={styles.welcomeText}>Welcome {user.firstName}</Text>*/}
 
             {/*<ScrollView contentContainerStyle={styles.scrollContainer}>*/}
@@ -115,6 +103,18 @@ const AccountsScreen = ({navigation, route}) => {
 
             </View>
             {/*</ScrollView>*/}
+
+            <View style={styles.bottomBarContainer}>
+                <TouchableOpacity onPress={() => firebase.auth().signOut()}>
+                    <Text style={styles.bottomBarText}>Log Out</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+                    <Text style={styles.bottomBarText}>Contact Us</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => navigation.navigate('LoggedIn')}>
+                    <Text style={styles.bottomBarText}>Portal</Text>
+                </TouchableOpacity>
+            </View>
         </SafeAreaView>
     );
 };
@@ -130,14 +130,14 @@ const styles = StyleSheet.create({
         marginLeft: 15,
         fontSize: 25,
     },
-    topBarText: {
+    bottomBarText: {
         color: 'white',
         fontSize: 18,
     },
-    topBarContainer: {
+    bottomBarContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginTop: 10,
+        marginTop: 380,
         marginBottom: 10,
         marginHorizontal: 10,
     },

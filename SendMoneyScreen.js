@@ -81,14 +81,11 @@ const SendMoneyScreen = ({navigation, route}) => {
 
     };
 
-
     const getRecipientUser = () => {
         return db.collection('bankAccounts').doc(rAccountNum.toString()).get()
             .then(documentSnapshot => {
                 return documentSnapshot.get('userID');
             });
-
-
     };
 
     return (
@@ -96,17 +93,7 @@ const SendMoneyScreen = ({navigation, route}) => {
             <View style={styles.logoContainer}>
                 <Image style={styles.logoImg} source={require('../BankBaseMobile/images/BankBaseLogo.png')}/>
             </View>
-            <View style={styles.topBarContainer}>
-                <TouchableOpacity onPress={() => firebase.auth().signOut()}>
-                    <Text style={styles.topBarText}>Log Out</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => navigation.navigate('Home')}>
-                    <Text style={styles.topBarText}>Contact Us</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => navigation.navigate('LoggedIn')}>
-                    <Text style={styles.topBarText}>Portal</Text>
-                </TouchableOpacity>
-            </View>
+
             <ScrollView contentContainerStyle={styles.scrollContainer}>
                 <View style={styles.inputTextContainer}>
                     <TextInput
@@ -136,6 +123,18 @@ const SendMoneyScreen = ({navigation, route}) => {
                 <Text style={{color: 'white'}}>{}</Text>
 
             </ScrollView>
+
+            <View style={styles.bottomBarContainer}>
+                <TouchableOpacity onPress={() => firebase.auth().signOut()}>
+                    <Text style={styles.bottomBarText}>Log Out</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+                    <Text style={styles.bottomBarText}>Contact Us</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => navigation.navigate('LoggedIn')}>
+                    <Text style={styles.bottomBarText}>Portal</Text>
+                </TouchableOpacity>
+            </View>
         </SafeAreaView>
     );
 };
@@ -149,14 +148,15 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
     },
-    topBarText: {
+    bottomBarText: {
         color: 'white',
         fontSize: 18,
     },
-    topBarContainer: {
+    bottomBarContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginTop: 10,
+        marginBottom: 10,
+        marginHorizontal: 10,
     },
     logoImg: {
         width: 425,
