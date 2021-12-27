@@ -6,51 +6,21 @@ import '@react-native-firebase/firestore';
 const db = firebase.firestore();
 const auth = firebase.auth();
 
-
 export const getTransactions = createAsyncThunk(
     'transactions/getTransactions',
     async () => {
-        // return await db.collection('transactions').where('userID', '==', auth.currentUser.uid)
-        //     .onSnapshot(querySnapshot => {
-        //         const transactions = [];
-        //
-        //         querySnapshot.forEach(documentSnapshot => {
-        //             transactions.push({
-        //                 ...documentSnapshot.data(),
-        //                 key: documentSnapshot.id,
-        //             });
-        //         });
-        //         console.log(transactions);
-        //     });
-
-        // return await db.collection('transactions').where('userID', '==', auth.currentUser.uid)
-        //     .onSnapshot(querySnapshot => {
-        //         const transactions = [];
-        //         querySnapshot.forEach(documentSnapshot => {
-        //             transactions.push({
-        //                 ...documentSnapshot.data(),
-        //                 key: documentSnapshot.id,
-        //             });
-        //         });
-        //         return JSON.stringify(transactions);
-        //     });
-
-        return await db.collection('transactions').where('userID', '==', auth.currentUser.uid)
-            .onSnapshot(querySnapshot => {
+        return await db.collection('transactions').where('userID', '==', auth.currentUser.uid).get()
+            .then(querySnapshot => {
                 const transactions = [];
-
                 querySnapshot.forEach(documentSnapshot => {
                     transactions.push({
                         ...documentSnapshot.data(),
                         key: documentSnapshot.id,
                     });
-                    return 'hey';
                 });
+                transactions.sort((a, b) => parseInt(a.balance) - parseInt(b.balance));
+                return transactions;
             });
-
-        console.log(transaction);
-        return 'hey';
-
     },
 );
 
@@ -72,12 +42,6 @@ const accountsSlice = createSlice({
             state.status = 'failed';
         },
     },
-    // reducers: {
-    //     getTransactions: (state, action) => {
-    //
-    //     }
-    // }
 });
-
 
 export default accountsSlice.reducer;

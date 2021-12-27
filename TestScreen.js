@@ -1,8 +1,9 @@
 /* eslint-disable */
 import React, {useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {StyleSheet, Text, View} from 'react-native';
+import {FlatList, Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {getTransactions} from './redux/slices/accountsSlice';
+import {firebase} from '@react-native-firebase/app';
 
 
 const TestScreen = ({navigation}) => {
@@ -19,68 +20,66 @@ const TestScreen = ({navigation}) => {
         return number.toLocaleString('en-US', {style: 'currency', currency: 'USD'});
     }
 
-    return (
-        <View>
-            <Text>{transactions}</Text>
-        </View>
-        // <View>
-        //     <Text>{transactions}</Text>
-        // </View>
-    );
+    const getWord = (item) => {
+        if (item === 'Sent') {
+            return 'Recipient ';
+        }
+        return 'Sender';
+    };
 
-    // return (
-    //     <SafeAreaView style={styles.mainContainer}>
-    //         <View style={styles.logoContainer}>
-    //             <Image style={styles.logoImg} source={require('../BankBaseMobile/images/BankBaseLogo.png')}/>
-    //         </View>
-    //
-    //         <View style={styles.testing}>
-    //             <Text style={styles.accountBalanceText}>{formatMoney(parseInt(500))}</Text>
-    //
-    //             <View style={styles.testing1}>
-    //                 <Text style={{color: 'white', alignSelf: 'center', marginTop: 15}}>Recent Transactions</Text>
-    //                 <View style={{
-    //                     minWidth: 300,
-    //                     maxWidth: 300,
-    //                     minHeight: 150,
-    //                     maxHeight: 150,
-    //                     backgroundColor: 'white',
-    //                     marginTop: 15,
-    //                     borderLeftWidth: 1,
-    //                     borderRightWidth: 1,
-    //                     borderBottomWidth: 1,
-    //                 }}>
-    //
-    //                     <FlatList
-    //                         data={transactions}
-    //                         renderItem={({item}) => (
-    //                             <View style={styles.transactionDisplay}>
-    //                                 <Text
-    //                                     style={styles.transactionText}>{item.transferStatus}: {formatMoney(parseInt(item.amount))}</Text>
-    //                                 {/*<Text*/}
-    //                                 {/*    style={styles.transactionText}>{getWord(item.transferStatus)}: {item.firstName} {item.lastName} </Text>*/}
-    //                                 <Text
-    //                                     style={styles.transactionText}>Balance: {formatMoney(parseInt(item.balance))}</Text>
-    //                             </View>
-    //                         )}/>
-    //                 </View>
-    //             </View>
-    //
-    //         </View>
-    //
-    //         <View style={styles.bottomBarContainer}>
-    //             <TouchableOpacity onPress={() => firebase.auth().signOut()}>
-    //                 <Text style={styles.bottomBarText}>Log Out</Text>
-    //             </TouchableOpacity>
-    //             <TouchableOpacity onPress={() => navigation.navigate('Home')}>
-    //                 <Text style={styles.bottomBarText}>Contact Us</Text>
-    //             </TouchableOpacity>
-    //             <TouchableOpacity onPress={() => navigation.navigate('LoggedIn')}>
-    //                 <Text style={styles.bottomBarText}>Portal</Text>
-    //             </TouchableOpacity>
-    //         </View>
-    //     </SafeAreaView>
-    // );
+    return (
+        <SafeAreaView style={styles.mainContainer}>
+            <View style={styles.logoContainer}>
+                <Image style={styles.logoImg} source={require('../BankBaseMobile/images/BankBaseLogo.png')}/>
+            </View>
+
+            <View style={styles.testing}>
+                <Text style={styles.accountBalanceText}>{formatMoney(parseInt(500))}</Text>
+
+                <View style={styles.testing1}>
+                    <Text style={{color: 'white', alignSelf: 'center', marginTop: 15}}>Recent Transactions</Text>
+                    <View style={{
+                        minWidth: 300,
+                        maxWidth: 300,
+                        minHeight: 150,
+                        maxHeight: 150,
+                        backgroundColor: 'white',
+                        marginTop: 15,
+                        borderLeftWidth: 1,
+                        borderRightWidth: 1,
+                        borderBottomWidth: 1,
+                    }}>
+
+                        <FlatList
+                            data={transactions}
+                            renderItem={({item}) => (
+                                <View style={styles.transactionDisplay}>
+                                    <Text
+                                        style={styles.transactionText}>{item.transferStatus}: {formatMoney(parseInt(item.amount))}</Text>
+                                    <Text
+                                        style={styles.transactionText}>{getWord(item.transferStatus)}: {item.firstName} {item.lastName} </Text>
+                                    <Text
+                                        style={styles.transactionText}>Balance: {formatMoney(parseInt(item.balance))}</Text>
+                                </View>
+                            )}/>
+                    </View>
+                </View>
+
+            </View>
+
+            <View style={styles.bottomBarContainer}>
+                <TouchableOpacity onPress={() => firebase.auth().signOut()}>
+                    <Text style={styles.bottomBarText}>Log Out</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+                    <Text style={styles.bottomBarText}>Contact Us</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => navigation.navigate('LoggedIn')}>
+                    <Text style={styles.bottomBarText}>Portal</Text>
+                </TouchableOpacity>
+            </View>
+        </SafeAreaView>
+    );
 };
 const styles = StyleSheet.create({
     mainContainer: {

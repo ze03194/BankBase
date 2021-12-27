@@ -52,7 +52,7 @@ export const getRecipientUserThunk = createAsyncThunk(
                         balance: newRecipientBalance,
                     });
                 } else {
-                    alert('InsufficientFunds!');
+                    alert('Insufficient Funds!');
                 }
                 alert('Transaction Successful!');
             });
@@ -69,16 +69,7 @@ const transactionSlice = createSlice({
         transaction: {},
         status: null,
     },
-    reducers: {
-        getRecipientUser: (state, action) => {
-            const {recipientUser} = action.payload;
-            // return recipientUser.accountNumber;
-            console.log('test');
-        },
 
-    },
 });
-
-export const {getRecipientUser} = transactionSlice.actions;
 
 export default transactionSlice.reducer;

@@ -16,79 +16,6 @@ const LoggedInScreen = ({navigation}) => {
     const user = useSelector(state => state.userDataReducer.currentUser);
     const accountNumber = useSelector(state => state.userDataReducer.accountNumber);
     const dispatch = useDispatch();
-    // const [accountNumb, setAccountNumb] = useState(123456789);
-    // const [retrieved, setRetrieved] = useState(false);
-    // const [user, setUser] = useState({
-    //     emailAddress: '',
-    //     firstName: '',
-    //     lastName: '',
-    //     address1: '',
-    //     address2: '',
-    //     city: '',
-    //     state: '',
-    //     zipCode: '',
-    //     accountNumber: 12345678901,
-    // });
-    //
-    // // const sendButtonHandler = () => {
-    // //     getRecipientUser().then(rUserID => {
-    // //             return updateTransactions(rUserID).then(_ => setRUserID(rUserID));
-    // //         },
-    // //     );
-    // // };
-    //
-    //
-    // // useEffect(() => {
-    // //     getUsers();
-    // //
-    // //     return () => {
-    // //         setUser({});
-    // //     };
-    // // }, []);
-    //
-    // useEffect(() => {
-    //
-    //     // getUsers();
-    //     getUsers();
-    //     // console.log('te1st: ' + JSON.stringify(currUser));
-    //     // getUsers();
-    //     return () => {
-    //         setUser({});
-    //     };
-    // }, [retrieved]);
-    //
-    // const getUsers = async () => {
-    //
-    //     const userRef = db.collection('users').doc(auth.currentUser.uid);
-    //     try {
-    //         return await db.runTransaction(async (t) => {
-    //             const doc = await t.get(userRef);
-    //             setUser({
-    //                 firstName: doc.data().firstName,
-    //                 lastName: doc.data().lastName,
-    //                 address1: doc.data().address1,
-    //                 address2: doc.data().address2,
-    //                 city: doc.data().city,
-    //                 state: doc.data().state,
-    //                 zipCode: doc.data().zipCode,
-    //                 emailAddress: doc.data().emailAddress,
-    //                 accountNumber: db.collection('bankAccounts').where('userID', '==', auth.currentUser.uid).get()
-    //                     .then(querySnapshot => {
-    //                         querySnapshot.forEach(documentSnapshot => {
-    //                             setAccountNumb(documentSnapshot.get('accountNumber'));
-    //                         });
-    //                     }),
-    //             });
-    //             setRetrieved(true);
-    //         });
-    //
-    //
-    //     } catch (e) {
-    //         console.log(e);
-    //     }
-    //
-    //
-    // };
 
     useEffect(() => {
         dispatch(getUser());
@@ -97,7 +24,6 @@ const LoggedInScreen = ({navigation}) => {
     }, [dispatch]);
 
     return (
-
         <SafeAreaView style={styles.mainContainer}>
             <View style={styles.logoContainer}>
                 <Image style={styles.logoImg} source={require('../BankBaseMobile/images/BankBaseLogo.png')}/>
@@ -109,39 +35,21 @@ const LoggedInScreen = ({navigation}) => {
                 <View style={styles.accountBoxContainer}>
                     <View style={styles.topBoxContainer}>
                         <Text style={{color: 'white', alignSelf: 'center', marginTop: 15}}>Accounts</Text>
-                        <View style={{
-                            minWidth: 300,
-                            maxWidth: 300,
-                            minHeight: 150,
-                            maxHeight: 150,
-                            backgroundColor: 'white',
-                            marginTop: 15,
-                            borderLeftWidth: 1,
-                            borderRightWidth: 1,
-                            borderBottomWidth: 1,
-                        }}>
+                        <View style={styles.accountsListBox}>
                             <ScrollView>
                                 <TouchableOpacity
                                     onPress={() => navigation.navigate('Accounts', {accountNumb: accountNumber})}>
                                     <Text>...{accountNumber.toString().substring(4)}</Text>
                                 </TouchableOpacity>
                             </ScrollView>
-
                         </View>
                     </View>
                 </View>
                 <View style={styles.bottomNavBar}>
                     <TouchableOpacity
-                        onPress={() => navigation.navigate('SendMoney', {
-                            accountNumb: accountNumber,
-                            currentFirstName: user.firstName,
-                            currentLastName: user.lastName,
-                        })}>
+                        onPress={() => navigation.navigate('SendMoney')}>
                         <Text style={{color: 'white'}}>Send Money</Text>
                     </TouchableOpacity>
-                    {/*<TouchableOpacity onPress={() => navigation.navigate('SendMoney', accountNumb)}>*/}
-                    {/*    <Text style={{color: 'white'}}>Request Money</Text>*/}
-                    {/*</TouchableOpacity>*/}
                 </View>
             </ScrollView>
             <View style={styles.bottomBarContainer}>
@@ -195,6 +103,17 @@ const styles = StyleSheet.create({
         marginTop: 20,
         backgroundColor: '#02295F',
         alignSelf: 'center',
+    },
+    accountsListBox: {
+        minWidth: 300,
+        maxWidth: 300,
+        minHeight: 150,
+        maxHeight: 150,
+        backgroundColor: 'white',
+        marginTop: 15,
+        borderLeftWidth: 1,
+        borderRightWidth: 1,
+        borderBottomWidth: 1,
     },
     bottomNavBar: {
         flex: 1,

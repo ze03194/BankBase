@@ -22,11 +22,27 @@ export const getAccountNumber = createAsyncThunk(
                     const doc = await t.get(accNumRef);
                     return doc.data().accountNumber;
                 });
-
             });
     },
 );
 
+export const getBalance = createAsyncThunk(
+    'user/getBalance',
+    async () => {
+        return await db.collection('bankAccounts').where('userID', '==', auth.currentUser.uid).get()
+            .then(async snapShot => {
+                let accN;
+                snapShot.forEach(documentSnapshot => {
+                    accN = documentSnapshot.get('accountNumber');
+                });
+                const accNumRef = db.collection('bankAccounts').doc(accN.toString());
+                return await db.runTransaction(async (t) => {
+                    const doc = await t.get(accNumRef);
+                    return doc.data().balance;
+                });
+            });
+    },
+);
 
 export const getUser = createAsyncThunk(
     'user/getUser',
@@ -43,12 +59,12 @@ export const getUser = createAsyncThunk(
     },
 );
 
-
 const userDataSlice = createSlice({
     name: 'getUser',
     initialState: {
         currentUser: {},
         accountNumber: '',
+        balance: 0,
         status: null,
     },
     reducers: {
@@ -57,10 +73,10 @@ const userDataSlice = createSlice({
             const accNum = Math.floor(10000000 + Math.random() * 99999999);
 
 
-            firebase.auth().createUserWithEmailAndPassword(newUser.emailAddress, newUser.password)
+            auth.createUserWithEmailAndPassword(newUser.emailAddress, newUser.password)
                 .then(() => {
-                    firebase.firestore().collection('users')
-                        .doc(firebase.auth().currentUser.uid)
+                    db.collection('users')
+                        .doc(auth.currentUser.uid)
                         .set({
                             firstName: newUser.firstName,
                             lastName: newUser.lastName,
@@ -72,8 +88,8 @@ const userDataSlice = createSlice({
                             zipCode: newUser.zipCode,
                         })
                         .then(() => {
-                            firebase.firestore().collection('bankAccounts').doc(accNum.toString()).set({
-                                userID: firebase.auth().currentUser.uid,
+                            db.collection('bankAccounts').doc(accNum.toString()).set({
+                                userID: auth.currentUser.uid,
                                 balance: newUser.balance,
                                 accountNumber: accNum,
                             })
@@ -107,6 +123,16 @@ const userDataSlice = createSlice({
             state.accountNumber = action.payload;
         },
         [getAccountNumber.rejected]: (state, action) => {
+            state.status = 'failed';
+        },
+        [getBalance.pending]: (state, action) => {
+            state.status = 'loading';
+        },
+        [getBalance.fulfilled]: (state, action) => {
+            state.status = 'success';
+            state.balance = action.payload;
+        },
+        [getBalance.rejected]: (state, action) => {
             state.status = 'failed';
         },
 
