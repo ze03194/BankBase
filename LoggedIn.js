@@ -1,89 +1,100 @@
 /* eslint-disable prettier/prettier,no-trailing-spaces */
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import {Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {firebase} from '@react-native-firebase/app';
 import '@react-native-firebase/auth';
 import '@react-native-firebase/firestore';
 import SafeAreaView from 'react-native/Libraries/Components/SafeAreaView/SafeAreaView';
+import {useDispatch, useSelector} from 'react-redux';
+import {getAccountNumber, getUser} from './redux/slices/userDataSlice';
 
 const db = firebase.firestore();
 const auth = firebase.auth();
 // const Stack = createNativeStackNavigator();
 
 const LoggedInScreen = ({navigation}) => {
-    const [accountNumb, setAccountNumb] = useState(123456789);
-    const [retrieved, setRetrieved] = useState(false);
-    const [user, setUser] = useState({
-        emailAddress: '',
-        firstName: '',
-        lastName: '',
-        address1: '',
-        address2: '',
-        city: '',
-        state: '',
-        zipCode: '',
-        accountNumber: 12345678901,
-    });
-
-    // const sendButtonHandler = () => {
-    //     getRecipientUser().then(rUserID => {
-    //             return updateTransactions(rUserID).then(_ => setRUserID(rUserID));
-    //         },
-    //     );
-    // };
-
-
-    // useEffect(() => {
-    //     getUsers();
+    const user = useSelector(state => state.userDataReducer.currentUser);
+    const accountNumber = useSelector(state => state.userDataReducer.accountNumber);
+    const dispatch = useDispatch();
+    // const [accountNumb, setAccountNumb] = useState(123456789);
+    // const [retrieved, setRetrieved] = useState(false);
+    // const [user, setUser] = useState({
+    //     emailAddress: '',
+    //     firstName: '',
+    //     lastName: '',
+    //     address1: '',
+    //     address2: '',
+    //     city: '',
+    //     state: '',
+    //     zipCode: '',
+    //     accountNumber: 12345678901,
+    // });
     //
+    // // const sendButtonHandler = () => {
+    // //     getRecipientUser().then(rUserID => {
+    // //             return updateTransactions(rUserID).then(_ => setRUserID(rUserID));
+    // //         },
+    // //     );
+    // // };
+    //
+    //
+    // // useEffect(() => {
+    // //     getUsers();
+    // //
+    // //     return () => {
+    // //         setUser({});
+    // //     };
+    // // }, []);
+    //
+    // useEffect(() => {
+    //
+    //     // getUsers();
+    //     getUsers();
+    //     // console.log('te1st: ' + JSON.stringify(currUser));
+    //     // getUsers();
     //     return () => {
     //         setUser({});
     //     };
-    // }, []);
+    // }, [retrieved]);
+    //
+    // const getUsers = async () => {
+    //
+    //     const userRef = db.collection('users').doc(auth.currentUser.uid);
+    //     try {
+    //         return await db.runTransaction(async (t) => {
+    //             const doc = await t.get(userRef);
+    //             setUser({
+    //                 firstName: doc.data().firstName,
+    //                 lastName: doc.data().lastName,
+    //                 address1: doc.data().address1,
+    //                 address2: doc.data().address2,
+    //                 city: doc.data().city,
+    //                 state: doc.data().state,
+    //                 zipCode: doc.data().zipCode,
+    //                 emailAddress: doc.data().emailAddress,
+    //                 accountNumber: db.collection('bankAccounts').where('userID', '==', auth.currentUser.uid).get()
+    //                     .then(querySnapshot => {
+    //                         querySnapshot.forEach(documentSnapshot => {
+    //                             setAccountNumb(documentSnapshot.get('accountNumber'));
+    //                         });
+    //                     }),
+    //             });
+    //             setRetrieved(true);
+    //         });
+    //
+    //
+    //     } catch (e) {
+    //         console.log(e);
+    //     }
+    //
+    //
+    // };
 
     useEffect(() => {
+        dispatch(getUser());
+        dispatch(getAccountNumber());
 
-        // getUsers();
-        getUsers();
-        // console.log('te1st: ' + JSON.stringify(currUser));
-        // getUsers();
-        return () => {
-            setUser({});
-        };
-    }, [retrieved]);
-
-    const getUsers = async () => {
-
-        const userRef = db.collection('users').doc(auth.currentUser.uid);
-        try {
-            return await db.runTransaction(async (t) => {
-                const doc = await t.get(userRef);
-                setUser({
-                    firstName: doc.data().firstName,
-                    lastName: doc.data().lastName,
-                    address1: doc.data().address1,
-                    address2: doc.data().address2,
-                    city: doc.data().city,
-                    state: doc.data().state,
-                    zipCode: doc.data().zipCode,
-                    emailAddress: doc.data().emailAddress,
-                    accountNumber: db.collection('bankAccounts').where('userID', '==', auth.currentUser.uid).get()
-                        .then(querySnapshot => {
-                            querySnapshot.forEach(documentSnapshot => {
-                                setAccountNumb(documentSnapshot.get('accountNumber'));
-                            });
-                        }),
-                });
-                setRetrieved(true);
-            });
-
-
-        } catch (e) {
-            console.log(e);
-        }
-
-
-    };
+    }, [dispatch]);
 
     return (
 
@@ -111,8 +122,8 @@ const LoggedInScreen = ({navigation}) => {
                         }}>
                             <ScrollView>
                                 <TouchableOpacity
-                                    onPress={() => navigation.navigate('Accounts', {accountNumb: accountNumb})}>
-                                    <Text>...{accountNumb.toString().substring(4)}</Text>
+                                    onPress={() => navigation.navigate('Accounts', {accountNumb: accountNumber})}>
+                                    <Text>...{accountNumber.toString().substring(4)}</Text>
                                 </TouchableOpacity>
                             </ScrollView>
 
@@ -122,7 +133,7 @@ const LoggedInScreen = ({navigation}) => {
                 <View style={styles.bottomNavBar}>
                     <TouchableOpacity
                         onPress={() => navigation.navigate('SendMoney', {
-                            accountNumb: accountNumb,
+                            accountNumb: accountNumber,
                             currentFirstName: user.firstName,
                             currentLastName: user.lastName,
                         })}>
@@ -137,7 +148,7 @@ const LoggedInScreen = ({navigation}) => {
                 <TouchableOpacity onPress={() => firebase.auth().signOut()}>
                     <Text style={styles.bottomBarText}>Log Out</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+                <TouchableOpacity onPress={() => navigation.navigate('Contact')}>
                     <Text style={styles.bottomBarText}>Contact Us</Text>
                 </TouchableOpacity>
             </View>

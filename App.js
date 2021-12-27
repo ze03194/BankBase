@@ -18,7 +18,9 @@ import LoginScreen from './LoginScreen';
 import RegisterScreen from './RegisterScreen';
 import AccountsScreen from './AccountsScreen';
 import NavContain from './NavContain';
-
+import TestScreen from './TestScreen';
+import {Provider} from 'react-redux';
+import store from './redux/store/configureStore';
 
 const firebaseConfig = {
     apiKey: 'AIzaSyBKyuWBMtiWMKi29brFRH3R062W5_1ePv4',
@@ -55,22 +57,27 @@ const App = () => {
 
     if (!user) {
         return (
-            <NavigationContainer>
-                <Stack.Navigator
-                    screenOptions={{
-                        headerShown: false,
-                    }}>
-                    <Stack.Screen
-                        name="Login"
-                        component={LoginScreen}/>
-                    <Stack.Screen
-                        name="Register"
-                        component={RegisterScreen}/>
-                    <Stack.Screen
-                        name="Accounts"
-                        component={AccountsScreen}/>
-                </Stack.Navigator>
-            </NavigationContainer>
+            <Provider store={store}>
+                <NavigationContainer>
+                    <Stack.Navigator
+                        screenOptions={{
+                            headerShown: false,
+                        }}>
+                        <Stack.Screen
+                            name="Login"
+                            component={LoginScreen}/>
+                        <Stack.Screen
+                            name="Register"
+                            component={RegisterScreen}/>
+                        <Stack.Screen
+                            name="Accounts"
+                            component={AccountsScreen}/>
+                        <Stack.Screen
+                            name={'Contact'}
+                            component={TestScreen}/>
+                    </Stack.Navigator>
+                </NavigationContainer>
+            </Provider>
         );
     }
 

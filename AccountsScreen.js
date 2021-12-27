@@ -14,7 +14,6 @@ const AccountsScreen = ({navigation, route}) => {
     const [transactions, setTransactions] = useState([]);
     const [balance, setBalance] = useState(0);
 
-    console.log('acctNumb: ' + accountNumb);
 
     function formatMoney(number) {
         return number.toLocaleString('en-US', {style: 'currency', currency: 'USD'});
@@ -35,8 +34,8 @@ const AccountsScreen = ({navigation, route}) => {
                 });
                 setTransactions(transactions);
             });
-        return () => transactions;
-    }, []);
+        // return () => transactions;
+    }, [transactions]);
 
 
     const getWord = (item) => {
@@ -66,9 +65,6 @@ const AccountsScreen = ({navigation, route}) => {
                 <Image style={styles.logoImg} source={require('../BankBaseMobile/images/BankBaseLogo.png')}/>
             </View>
 
-            {/*<Text style={styles.welcomeText}>Welcome {user.firstName}</Text>*/}
-
-            {/*<ScrollView contentContainerStyle={styles.scrollContainer}>*/}
             <View style={styles.testing}>
                 <Text style={styles.accountBalanceText}>{formatMoney(parseInt(balance))}</Text>
 
@@ -102,7 +98,6 @@ const AccountsScreen = ({navigation, route}) => {
                 </View>
 
             </View>
-            {/*</ScrollView>*/}
 
             <View style={styles.bottomBarContainer}>
                 <TouchableOpacity onPress={() => firebase.auth().signOut()}>

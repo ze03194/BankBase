@@ -5,89 +5,111 @@ import {Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} 
 import {firebase} from '@react-native-firebase/app';
 import '@react-native-firebase/auth';
 import '@react-native-firebase/firestore';
+import {useDispatch, useSelector} from 'react-redux';
+import {getRecipientUserThunk} from './redux/slices/transactionSlice';
 
 const db = firebase.firestore();
 const auth = firebase.auth();
 
 
 const SendMoneyScreen = ({navigation, route}) => {
+    //
+    // const {accountNumb} = route.params;
+    // const {currentFirstName} = route.params;
+    // const {currentLastName} = route.params;
+    //
+    //
+    // const [recipientFirstName, setRecipientFirstName] = useState('');
+    // const [recipientLastName, setRecipientLastName] = useState('');
+    //
+    // const [rAccountNum, setRAccountNum] = useState(0);
+    // const [rUserID, setRUserID] = useState('');
+    // const [transferredAmount, setTransferredAmount] = useState(0);
+    //
+    //
+    // const sendButtonHandler = () => {
+    //     getRecipientUser().then(rUserID => {
+    //             return updateTransactions(rUserID).then(_ => setRUserID(rUserID));
+    //         },
+    //     );
+    // };
+    //
+    // const updateTransactions = async (rUserID) => {
+    //
+    //     const currentAccount = db.collection('bankAccounts').doc(accountNumb.toString());
+    //     const recipientAccount = db.collection('bankAccounts').doc(rAccountNum.toString());
+    //     const recipientTransaction = db.collection('transactions').doc();
+    //     const currentTransaction = db.collection('transactions').doc();
+    //
+    //     try {
+    //         db.runTransaction(async t => {
+    //             const currentDoc = await t.get(currentAccount);
+    //             const newCurrentBalance = currentDoc.data().balance - parseInt(transferredAmount);
+    //
+    //             if (newCurrentBalance > 0) {
+    //                 t.update(currentAccount, {balance: newCurrentBalance});
+    //                 t.set(currentTransaction, {
+    //                     userID: auth.currentUser.uid,
+    //                     amount: transferredAmount,
+    //                     transferStatus: 'Sent',
+    //                     sentTo: rAccountNum,
+    //                     firstName: recipientFirstName,
+    //                     lastName: recipientLastName,
+    //                     balance: newCurrentBalance,
+    //                 });
+    //
+    //                 const recipientDoc = await t.get(recipientAccount);
+    //                 const newRecipientBalance = recipientDoc.data().balance + parseInt(transferredAmount);
+    //                 t.update(recipientAccount, {balance: newRecipientBalance});
+    //                 t.set(recipientTransaction, {
+    //                     userID: rUserID,
+    //                     amount: transferredAmount,
+    //                     transferStatus: 'Received',
+    //                     receivedFrom: accountNumb,
+    //                     firstName: currentFirstName,
+    //                     lastName: currentLastName,
+    //                     balance: newRecipientBalance,
+    //                 });
+    //
+    //             } else {
+    //                 alert('Insufficient funds!');
+    //             }
+    //
+    //             alert('Transaction Successful!');
+    //         });
+    //     } catch (e) {
+    //         alert('Transaction Failure', e);
+    //     }
+    //
+    // };
+    //
+    // const getRecipientUser = () => {
+    //     return db.collection('bankAccounts').doc(rAccountNum.toString()).get()
+    //         .then(documentSnapshot => {
+    //             return documentSnapshot.get('userID');
+    //         });
+    // };
 
-    const {accountNumb} = route.params;
-    const {currentFirstName} = route.params;
-    const {currentLastName} = route.params;
+    // const user = useSelector((state) => ((state.userDataReducer.currentUser)));
+    const accNum = useSelector(state => state.userDataReducer.accountNumber);
+    const dispatch = useDispatch();
 
 
-    const [recipientFirstName, setRecipientFirstName] = useState('');
-    const [recipientLastName, setRecipientLastName] = useState('');
+    const [recipientUser, setRecipientUser] = useState({
+        firstName: '',
+        lastName: '',
+        accountNumber: '',
+        sendAmount: 0,
+        currentAccountNumber: accNum,
 
-    const [rAccountNum, setRAccountNum] = useState(0);
-    const [rUserID, setRUserID] = useState('');
-    const [transferredAmount, setTransferredAmount] = useState(0);
+    });
 
-
-    const sendButtonHandler = () => {
-        getRecipientUser().then(rUserID => {
-                return updateTransactions(rUserID).then(_ => setRUserID(rUserID));
-            },
-        );
+    const changeTextInput = (key, value) => {
+        setRecipientUser({
+            ...recipientUser,
+            [key]: value,
+        }, []);
     };
-
-    const updateTransactions = async (rUserID) => {
-
-        const currentAccount = db.collection('bankAccounts').doc(accountNumb.toString());
-        const recipientAccount = db.collection('bankAccounts').doc(rAccountNum.toString());
-        const recipientTransaction = db.collection('transactions').doc();
-        const currentTransaction = db.collection('transactions').doc();
-
-        try {
-            db.runTransaction(async t => {
-                const currentDoc = await t.get(currentAccount);
-                const newCurrentBalance = currentDoc.data().balance - parseInt(transferredAmount);
-
-                if (newCurrentBalance > 0) {
-                    t.update(currentAccount, {balance: newCurrentBalance});
-                    t.set(currentTransaction, {
-                        userID: auth.currentUser.uid,
-                        amount: transferredAmount,
-                        transferStatus: 'Sent',
-                        sentTo: rAccountNum,
-                        firstName: recipientFirstName,
-                        lastName: recipientLastName,
-                        balance: newCurrentBalance,
-                    });
-
-                    const recipientDoc = await t.get(recipientAccount);
-                    const newRecipientBalance = recipientDoc.data().balance + parseInt(transferredAmount);
-                    t.update(recipientAccount, {balance: newRecipientBalance});
-                    t.set(recipientTransaction, {
-                        userID: rUserID,
-                        amount: transferredAmount,
-                        transferStatus: 'Received',
-                        receivedFrom: accountNumb,
-                        firstName: currentFirstName,
-                        lastName: currentLastName,
-                        balance: newRecipientBalance,
-                    });
-
-                } else {
-                    alert('Insufficient funds!');
-                }
-
-                alert('Transaction Successful!');
-            });
-        } catch (e) {
-            alert('Transaction Failure', e);
-        }
-
-    };
-
-    const getRecipientUser = () => {
-        return db.collection('bankAccounts').doc(rAccountNum.toString()).get()
-            .then(documentSnapshot => {
-                return documentSnapshot.get('userID');
-            });
-    };
-
     return (
         <SafeAreaView style={styles.mainContainer}>
             <View style={styles.logoContainer}>
@@ -99,24 +121,26 @@ const SendMoneyScreen = ({navigation, route}) => {
                     <TextInput
                         placeholder={'First Name'}
                         style={styles.inputText}
-                        onChangeText={text => setRecipientFirstName(text)}
+                        onChangeText={text => changeTextInput('firstName', text)}
                     />
                     <TextInput
                         placeholder={'Last Name'}
                         style={styles.inputText}
-                        onChangeText={text => setRecipientLastName(text)}
+                        onChangeText={text => changeTextInput('lastName', text)}
                     />
                     <TextInput
                         placeholder={'Account Number'}
                         style={styles.inputText}
-                        onChangeText={text => setRAccountNum(text)}
+                        onChangeText={text => changeTextInput('accountNumber', text)}
                     />
                     <TextInput
                         placeholder={'Amount to Send'}
                         style={styles.inputText}
-                        onChangeText={text => setTransferredAmount(text)}
+                        onChangeText={text => changeTextInput('sendAmount', text)}
                     />
-                    <TouchableOpacity style={styles.registerButton} onPress={sendButtonHandler}>
+                    <TouchableOpacity style={styles.registerButton} onPress={() => {
+                        dispatch(getRecipientUserThunk(recipientUser));
+                    }}>
                         <Text style={styles.textButton}>Send</Text>
                     </TouchableOpacity>
                 </View>

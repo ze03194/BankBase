@@ -7,12 +7,17 @@ import SafeAreaView from 'react-native/Libraries/Components/SafeAreaView/SafeAre
 import {firebase} from '@react-native-firebase/app';
 import '@react-native-firebase/auth';
 import '@react-native-firebase/firestore';
+import {addUser} from './redux/slices/userDataSlice';
+import {useDispatch} from 'react-redux';
 
 
 const db = firebase.firestore();
 const auth = firebase.auth();
-const RegisterScreen = (props) => {
-        const accNum = Math.floor(10000000 + Math.random() * 99999999);
+const RegisterScreen = () => {
+        // const accNum = Math.floor(10000000 + Math.random() * 99999999);
+
+        const dispatch = useDispatch();
+
 
         const [registration, setRegistration] = useState({
             password: '',
@@ -26,7 +31,7 @@ const RegisterScreen = (props) => {
             zipCode: '',
             securityPin: '',
             balance: Math.floor(10000 + Math.random() * 99999),
-            // balance: formatMoney(Math.floor(10000 + Math.random() * 99999)),
+            accNum: Math.floor(10000000 + Math.random() * 99999999),
         });
 
         const changeTextInput = (key, value) => {
@@ -35,45 +40,36 @@ const RegisterScreen = (props) => {
                 [key]: value,
             }, []);
         };
-        const registerButtonHandler = () => {
-            firebase.auth().createUserWithEmailAndPassword(registration.emailAddress, registration.password)
-                .then(() => {
-                    firebase.firestore().collection('users')
-                        .doc(firebase.auth().currentUser.uid)
-                        .set({
-                            firstName: registration.firstName,
-                            lastName: registration.lastName,
-                            emailAddress: registration.emailAddress,
-                            address1: registration.address1,
-                            address2: registration.address2,
-                            city: registration.city,
-                            state: registration.state,
-                            zipCode: registration.zipCode,
-                        })
-                        .then(() => {
-                            firebase.firestore().collection('bankAccounts').doc(accNum.toString()).set({
-                                userID: firebase.auth().currentUser.uid,
-                                balance: registration.balance,
-                                accountNumber: accNum,
-                            })
-                                .then((result) => {
-                                    console.log(result);
-                                });
-                        });
-                    // .then(() => {
-                    //     firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).collection('bankAccounts').doc(accNum.toString())
-                    //         .collection('transactions').add({
-                    //         userID: firebase.auth().currentUser.uid,
-                    //         accountNumber: accNum,
-                    //         transferStatus: ' ',
-                    //         amount: ' ',
-                    //     });
-                    // });
-                })
-                .catch(error => {
-                    console.log(error);
-                });
-        };
+        // const registerButtonHandler = () => {
+        //     firebase.auth().createUserWithEmailAndPassword(registration.emailAddress, registration.password)
+        //         .then(() => {
+        //             firebase.firestore().collection('users')
+        //                 .doc(firebase.auth().currentUser.uid)
+        //                 .set({
+        //                     firstName: registration.firstName,
+        //                     lastName: registration.lastName,
+        //                     emailAddress: registration.emailAddress,
+        //                     address1: registration.address1,
+        //                     address2: registration.address2,
+        //                     city: registration.city,
+        //                     state: registration.state,
+        //                     zipCode: registration.zipCode,
+        //                 })
+        //                 .then(() => {
+        //                     firebase.firestore().collection('bankAccounts').doc(accNum.toString()).set({
+        //                         userID: firebase.auth().currentUser.uid,
+        //                         balance: registration.balance,
+        //                         accountNumber: accNum,
+        //                     })
+        //                         .then((result) => {
+        //                             console.log(result);
+        //                         });
+        //                 });
+        //         })
+        //         .catch(error => {
+        //             console.log(error);
+        //         });
+        // };
         return (
             <SafeAreaView style={styles.registerContainer}>
                 <View style={styles.logoContainer}>
@@ -143,7 +139,9 @@ const RegisterScreen = (props) => {
                         secureTextEntry={true}
                         onChangeText={text => changeTextInput('securityPin', text)}
                     />
-                    <TouchableOpacity style={styles.registerButton} onPress={registerButtonHandler}>
+                    <TouchableOpacity style={styles.registerButton} onPress={() => {
+                        dispatch(addUser({newUser: registration}));
+                    }}>
                         <Text style={styles.textButton}>Register</Text>
                     </TouchableOpacity>
                 </ScrollView>
