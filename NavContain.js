@@ -10,6 +10,8 @@ import SendMoneyScreen from './SendMoneyScreen';
 import TestScreen from './TestScreen';
 import {Provider} from 'react-redux';
 import store from './redux/store/configureStore';
+import NewAccountScreen from './NewAccountScreen';
+import DepositScreen from './DepositScreen';
 
 
 const Stack = createNativeStackNavigator();
@@ -36,12 +38,16 @@ function NavContain() {
                         component={RegisterScreen}/>
                     <Stack.Screen
                         name="Accounts"
-                        component={AccountsScreen}
-                    />
+                        component={AccountsScreen}/>
                     <Stack.Screen
                         name="Contact"
-                        component={TestScreen}
-                    />
+                        component={TestScreen}/>
+                    <Stack.Screen
+                        name="NewAccount"
+                        component={NewAccountScreen}/>
+                    <Stack.Screen
+                        name="Deposit"
+                        component={DepositScreen}/>
                 </Stack.Navigator>
             </NavigationContainer>
         </Provider>

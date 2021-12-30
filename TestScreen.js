@@ -1,19 +1,25 @@
 /* eslint-disable */
 import React, {useEffect} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
-import {FlatList, Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import {getTransactions} from './redux/slices/accountsSlice';
+import {FlatList, Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {firebase} from '@react-native-firebase/app';
+import '@react-native-firebase/auth';
+import '@react-native-firebase/firestore';
+import SafeAreaView from 'react-native/Libraries/Components/SafeAreaView/SafeAreaView';
+import {useDispatch, useSelector} from 'react-redux';
+import {getTransactions} from './redux/slices/accountsSlice';
 
 
-const TestScreen = ({navigation}) => {
+const TestScreen = ({navigation, route}) => {
+
+    // const {accountNum} = route.params;
 
     const transactions = useSelector(state => state.accountsReducer.transactions);
+    const currentBalance = useSelector(state => state.userDataReducer.balance);
     const dispatch = useDispatch();
-
 
     useEffect(() => {
         dispatch(getTransactions());
+        // dispatch(getBalance(accountNum));
     }, [dispatch]);
 
     function formatMoney(number) {
@@ -33,23 +39,11 @@ const TestScreen = ({navigation}) => {
                 <Image style={styles.logoImg} source={require('../BankBaseMobile/images/BankBaseLogo.png')}/>
             </View>
 
-            <View style={styles.testing}>
-                <Text style={styles.accountBalanceText}>{formatMoney(parseInt(500))}</Text>
-
-                <View style={styles.testing1}>
+            <View style={styles.transactionsContainer}>
+                <Text style={styles.accountBalanceText}>Balance: {formatMoney(parseInt(currentBalance))}</Text>
+                <View style={styles.topTransactionBox}>
                     <Text style={{color: 'white', alignSelf: 'center', marginTop: 15}}>Recent Transactions</Text>
-                    <View style={{
-                        minWidth: 300,
-                        maxWidth: 300,
-                        minHeight: 150,
-                        maxHeight: 150,
-                        backgroundColor: 'white',
-                        marginTop: 15,
-                        borderLeftWidth: 1,
-                        borderRightWidth: 1,
-                        borderBottomWidth: 1,
-                    }}>
-
+                    <View style={styles.transactionFlatList}>
                         <FlatList
                             data={transactions}
                             renderItem={({item}) => (
@@ -64,7 +58,16 @@ const TestScreen = ({navigation}) => {
                             )}/>
                     </View>
                 </View>
-
+            </View>
+            <View style={styles.sendMoneyContainer}>
+                <TouchableOpacity
+                    onPress={() => navigation.navigate('SendMoney')}>
+                    <Text style={{color: 'white'}}>Send Money</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() => navigation.navigate('SendMoney')}>
+                    <Text style={{color: 'white'}}>Deposit</Text>
+                </TouchableOpacity>
             </View>
 
             <View style={styles.bottomBarContainer}>
@@ -84,6 +87,7 @@ const TestScreen = ({navigation}) => {
 const styles = StyleSheet.create({
     mainContainer: {
         flex: 1,
+        flexDirection: 'column',
         backgroundColor: '#02295F',
     },
     scrollContainer: {},
@@ -100,7 +104,6 @@ const styles = StyleSheet.create({
     bottomBarContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginTop: 380,
         marginBottom: 10,
         marginHorizontal: 10,
     },
@@ -108,12 +111,12 @@ const styles = StyleSheet.create({
         width: 425,
         height: 80,
     },
-    testing: {
+    transactionsContainer: {
         minWidth: 250,
         minHeight: 250,
         backgroundColor: 'white',
         marginTop: 10,
-    }, testing1: {
+    }, topTransactionBox: {
         minWidth: 300,
         maxWidth: 300,
         minHeight: 50,
@@ -127,6 +130,17 @@ const styles = StyleSheet.create({
         minHeight: 75,
         maxHeight: 80,
     },
+    transactionFlatList: {
+        minWidth: 300,
+        maxWidth: 300,
+        minHeight: 150,
+        maxHeight: 150,
+        backgroundColor: 'white',
+        marginTop: 15,
+        borderLeftWidth: 1,
+        borderRightWidth: 1,
+        borderBottomWidth: 1,
+    },
     transactionText: {
         color: 'black',
         fontWeight: 'bold',
@@ -134,134 +148,17 @@ const styles = StyleSheet.create({
     accountBalanceText: {
         color: 'black',
         fontWeight: 'bold',
+        marginLeft: 5,
+    },
+    sendMoneyContainer: {
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 10,
+        marginHorizontal: 10,
+
     },
 
-
 });
-
-
-//     const [recipientUser, setRecipientUser] = useState({
-//         firstName: '',
-//         lastName: '',
-//         accountNumber: '',
-//         sendAmount: 0,
-//         currentAccountNumber: accNum,
-//
-//     });
-//
-//     const changeTextInput = (key, value) => {
-//         setRecipientUser({
-//             ...recipientUser,
-//             [key]: value,
-//         }, []);
-//     };
-//
-//     useEffect(() => {
-//         dispatch(getUser());
-//         dispatch(getAccountNumber());
-//     }, [dispatch]);
-//
-//     return (
-//         // <View>
-//         //     <Text>{user.firstName}</Text>
-//         //     <Text>{accNum}</Text>
-//
-//
-//         <SafeAreaView style={styles.mainContainer}>
-//
-//             <ScrollView contentContainerStyle={styles.scrollContainer}>
-//                 <View style={styles.inputTextContainer}>
-//                     <TextInput
-//                         placeholder={'First Name'}
-//                         style={styles.inputText}
-//                         onChangeText={text => changeTextInput('firstName', text)}
-//                     />
-//                     <TextInput
-//                         placeholder={'Last Name'}
-//                         style={styles.inputText}
-//                         onChangeText={text => changeTextInput('lastName', text)}
-//                     />
-//                     <TextInput
-//                         placeholder={'Account Number'}
-//                         style={styles.inputText}
-//                         onChangeText={text => changeTextInput('accountNumber', text)}
-//                     />
-//                     <TextInput
-//                         placeholder={'Amount to Send'}
-//                         style={styles.inputText}
-//                         onChangeText={text => changeTextInput('sendAmount', text)}
-//                     />
-//                     <TouchableOpacity style={styles.registerButton} onPress={() => {
-//                         // dispatch(getRecipientUser({recipientUser: recipientUser}));
-//                         // dispatch(getRecipientUserThunk(recipientUser));
-//                         console.log('hey');
-//                     }}>
-//                         <Text style={styles.textButton}>Send</Text>
-//                     </TouchableOpacity>
-//                 </View>
-//                 <Text style={{color: 'white'}}>{}</Text>
-//
-//             </ScrollView>
-//         </SafeAreaView>
-//
-//         // </View>
-//
-//     );
-// };
-//
-// const styles = StyleSheet.create({
-//     mainContainer: {
-//         flex: 1,
-//         backgroundColor: '#02295F',
-//     },
-//     scrollContainer: {
-//         flex: 1,
-//         justifyContent: 'center',
-//     },
-//     bottomBarText: {
-//         color: 'white',
-//         fontSize: 18,
-//     },
-//     bottomBarContainer: {
-//         flexDirection: 'row',
-//         justifyContent: 'space-between',
-//         marginBottom: 10,
-//         marginHorizontal: 10,
-//     },
-//     logoImg: {
-//         width: 425,
-//         height: 80,
-//     },
-//     inputTextContainer: {
-//         flex: 1,
-//         alignItems: 'center',
-//         marginTop: 30,
-//     },
-//     inputText: {
-//         backgroundColor: 'white',
-//         width: 250,
-//         marginLeft: 20,
-//         borderBottomWidth: 1,
-//         marginBottom: 7,
-//     },
-//     registerButton: {
-//         alignItems: 'center',
-//         paddingVertical: 12,
-//         paddingHorizontal: 32,
-//         borderRadius: 20,
-//         width: 150,
-//         elevation: 3,
-//         backgroundColor: 'white',
-//         borderWidth: 2,
-//     },
-//     textButton: {
-//         fontSize: 16,
-//         lineHeight: 21,
-//         fontWeight: 'bold',
-//         letterSpacing: 0.25,
-//         color: '#02295F',
-//     },
-// });
-
 
 export default TestScreen;

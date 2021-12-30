@@ -5,11 +5,12 @@ import {Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} 
 import {firebase} from '@react-native-firebase/app';
 import '@react-native-firebase/auth';
 import '@react-native-firebase/firestore';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {initiateTransactionThunk} from './redux/slices/transactionSlice';
 
-const SendMoneyScreen = ({navigation, route}) => {
-    const {accountNum} = route.params;
+const DepositScreen = ({navigation}) => {
+    // const {accountNum} = route.params;
+    const testing = useSelector(state => state.accountsReducer.accountNumber);
     const dispatch = useDispatch();
 
     const [recipientUser, setRecipientUser] = useState({
@@ -17,14 +18,22 @@ const SendMoneyScreen = ({navigation, route}) => {
         lastName: '',
         accountNumber: '',
         sendAmount: 0,
-        currentAccountNumber: accountNum,
+        // currentAccountNumber: accountNum,
 
     });
 
     useEffect(() => {
-        console.log('sendMonScreen: ' + accountNum);
+        console.log('depscreen: ' + testing);
     });
 
+    // useEffect(() => {
+    //     let testing = dispatch(getAccountNumber());
+    //     console.log('sendMonAcc: ' + testing);
+    // });
+
+    // useEffect(() => {
+    //     console.log('sendMon Acc: ' + getAccountNumber());
+    // }, [dispatch()]);
 
     const changeTextInput = (key, value) => {
         setRecipientUser({
@@ -139,4 +148,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default SendMoneyScreen;
+export default DepositScreen;

@@ -1,31 +1,20 @@
 /* eslint-disable prettier/prettier */
 import React, {useState} from 'react';
 import {StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
-import {firebase} from '@react-native-firebase/app';
 import '@react-native-firebase/auth';
 import '@react-native-firebase/firestore';
-
-const userCredential = [];
+import {useDispatch} from 'react-redux';
+import {getLogin} from './redux/slices/userDataSlice';
 
 const LoginScreen = ({navigation}) => {
-    const [emailAddress, setEmailAddress] = useState('');
-    const [userPw, setUserPw] = useState('');
+    const dispatch = useDispatch();
 
-    const loginButtonHandler = () => {
-        const user = {
-            'emailAddress': emailAddress,
-            'userPw': userPw,
-        };
-        userCredential.push(user);
-
-        firebase.auth().signInWithEmailAndPassword(user.emailAddress, user.userPw)
-            .then(result => {
-                console.log(result);
-            })
-            .catch(error => {
-                console.log(error);
-            });
-
+    const [userCredential, setUserCredential] = useState({});
+    const changeTextInput = (key, value) => {
+        setUserCredential({
+            ...userCredential,
+            [key]: value,
+        }, []);
     };
 
     return (
@@ -39,7 +28,7 @@ const LoginScreen = ({navigation}) => {
                     <TextInput
                         style={styles.textInput}
                         selectionColor={'white'}
-                        onChangeText={eAddress => setEmailAddress(eAddress)}
+                        onChangeText={text => changeTextInput('emailAddress', text)}
                     />
                 </View>
                 <View>
@@ -48,7 +37,7 @@ const LoginScreen = ({navigation}) => {
                         style={styles.textInput}
                         secureTextEntry={true}
                         selectionColor={'white'}
-                        onChangeText={uPw => setUserPw(uPw)}
+                        onChangeText={text => changeTextInput('password', text)}
                     />
                 </View>
                 <View style={styles.promptContainer}>
@@ -60,10 +49,9 @@ const LoginScreen = ({navigation}) => {
                     <Text style={styles.promptText}>Forgot Password</Text>
                 </View>
 
-                <TouchableOpacity style={styles.loginButton} onPress={loginButtonHandler}>
+                <TouchableOpacity style={styles.loginButton} onPress={() => dispatch(getLogin(userCredential))}>
                     <Text style={styles.textButton}>Login</Text>
                 </TouchableOpacity>
-
             </View>
         </View>
     );

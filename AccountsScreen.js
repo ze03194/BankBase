@@ -10,15 +10,19 @@ import {getTransactions} from './redux/slices/accountsSlice';
 import {getBalance} from './redux/slices/userDataSlice';
 
 
-const AccountsScreen = ({navigation}) => {
+const AccountsScreen = ({navigation, route}) => {
 
+    // const {accountNum} = route.params;
     const transactions = useSelector(state => state.accountsReducer.transactions);
     const currentBalance = useSelector(state => state.userDataReducer.balance);
+    const accountNum = useSelector(state => state.accountsReducer.accountNumber);
     const dispatch = useDispatch();
 
     useEffect(() => {
-        dispatch(getTransactions());
-        dispatch(getBalance());
+        console.log('accScreen: ' + accountNum);
+        dispatch(getTransactions(accountNum));
+        dispatch(getBalance(accountNum));
+        // dispatch(setAccountNumber({accountNum}));
     }, [dispatch]);
 
     function formatMoney(number) {
@@ -37,7 +41,6 @@ const AccountsScreen = ({navigation}) => {
             <View style={styles.logoContainer}>
                 <Image style={styles.logoImg} source={require('../BankBaseMobile/images/BankBaseLogo.png')}/>
             </View>
-
             <View style={styles.transactionsContainer}>
                 <Text style={styles.accountBalanceText}>Balance: {formatMoney(parseInt(currentBalance))}</Text>
                 <View style={styles.topTransactionBox}>
@@ -57,6 +60,20 @@ const AccountsScreen = ({navigation}) => {
                             )}/>
                     </View>
                 </View>
+            </View>
+            <View style={styles.accountOptionsContainer}>
+                <TouchableOpacity
+                    onPress={() => {
+                        navigation.navigate('SendMoney', {
+                            accountNum: accountNum,
+                        });
+                    }}>
+                    <Text style={styles.accountOptionsText}>Send Money</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() => navigation.navigate('Deposit')}>
+                    <Text style={styles.accountOptionsText}>Deposit</Text>
+                </TouchableOpacity>
             </View>
 
             <View style={styles.bottomBarContainer}>
@@ -92,7 +109,6 @@ const styles = StyleSheet.create({
     bottomBarContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginTop: 380,
         marginBottom: 10,
         marginHorizontal: 10,
     },
@@ -101,11 +117,11 @@ const styles = StyleSheet.create({
         height: 80,
     },
     transactionsContainer: {
-        minWidth: 250,
-        minHeight: 250,
+        minHeight: 270,
         backgroundColor: 'white',
         marginTop: 10,
-    }, topTransactionBox: {
+    },
+    topTransactionBox: {
         minWidth: 300,
         maxWidth: 300,
         minHeight: 50,
@@ -139,6 +155,18 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginLeft: 5,
     },
+    accountOptionsContainer: {
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 10,
+        marginHorizontal: 10,
+    },
+    accountOptionsText: {
+        color: 'white',
+        fontSize: 18,
+    },
+
 });
 
 export default AccountsScreen;

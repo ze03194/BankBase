@@ -6,14 +6,16 @@ import '@react-native-firebase/firestore';
 const db = firebase.firestore();
 const auth = firebase.auth();
 
-export const getRecipientUserThunk = createAsyncThunk(
+export const initiateTransactionThunk = createAsyncThunk(
     'transaction/getRecipientUserThunk',
     async (recipientUser) => {
         const rUser = recipientUser.valueOf();
         const currentAccount = db.collection('bankAccounts').doc(rUser.currentAccountNumber.toString());
         const recipientAccount = db.collection('bankAccounts').doc(rUser.accountNumber.toString());
-        const recipientTransaction = db.collection('transactions').doc();
-        const currentTransaction = db.collection('transactions').doc();
+        // const recipientTransaction = db.collection('transactions').doc();
+        // const currentTransaction = db.collection('transactions').doc();
+        const recipientTransaction = db.collection('bankAccounts').doc(rUser.accountNumber.toString()).collection('transactions').doc();
+        const currentTransaction = db.collection('bankAccounts').doc(rUser.currentAccountNumber.toString()).collection('transactions').doc();
         const currentUser = await db.collection('users').doc(auth.currentUser.uid).get()
             .then(documentSnapshot => {
                 return documentSnapshot.data();
