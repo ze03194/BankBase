@@ -1,9 +1,10 @@
 import React, {useEffect, useState} from 'react';
-import {Image, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
+import {SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity} from 'react-native';
 import {getUser} from './redux/slices/userDataSlice';
 import {useDispatch, useSelector} from 'react-redux';
 import {Picker} from '@react-native-picker/picker';
 import {createAccount} from './redux/slices/accountsSlice';
+import {Logo, styles} from './stylesExports';
 
 const NewAccountScreen = ({navigation}) => {
 
@@ -29,10 +30,8 @@ const NewAccountScreen = ({navigation}) => {
     };
 
     return (
-        <SafeAreaView style={styles.registerContainer}>
-            <View style={styles.logoContainer}>
-                <Image style={styles.logoImg} source={require('../BankBaseMobile/images/BankBaseLogo.png')}/>
-            </View>
+        <SafeAreaView style={styles.mainContainer}>
+            <Logo/>
             <Text style={{color: 'white', fontSize: 15, marginTop: 20, alignSelf: 'center'}}>Confirm Your Profile
                 Information</Text>
             <ScrollView contentContainerStyle={styles.inputTextContainer}>
@@ -89,7 +88,7 @@ const NewAccountScreen = ({navigation}) => {
                     <Picker.Item label="Checking" value="Checking"/>
                     <Picker.Item label="Saving" value="Savings"/>
                 </Picker>
-                <TouchableOpacity style={styles.confirmButton} onPress={() => {
+                <TouchableOpacity style={styles.submitButton} onPress={() => {
                     dispatch(createAccount({accountType}));
                     navigation.navigate('LoggedIn');
                 }}>
@@ -100,53 +99,54 @@ const NewAccountScreen = ({navigation}) => {
     );
 };
 
-const styles = StyleSheet.create({
-    registerContainer: {
-        flex: 1,
-        backgroundColor: '#02295F',
-    },
-    logoImg: {
-        width: 425,
-        height: 80,
-    },
-    inputText: {
-        backgroundColor: 'white',
-        width: 250,
-        marginLeft: 20,
-        borderBottomWidth: 1,
-        marginBottom: 7,
-
-    },
-    inputTextContainer: {
-        alignItems: 'center',
-        marginTop: 15,
-    },
-    confirmButton: {
-        alignItems: 'center',
-        paddingVertical: 12,
-        paddingHorizontal: 32,
-        borderRadius: 20,
-        width: 150,
-        elevation: 3,
-        backgroundColor: 'white',
-        borderWidth: 2,
-        marginTop: 5,
-    },
-    textButton: {
-        fontSize: 16,
-        lineHeight: 21,
-        fontWeight: 'bold',
-        letterSpacing: 0.25,
-        color: '#02295F',
-    },
-    dropDownMenu: {
-        backgroundColor: 'white',
-        minWidth: 250,
-        maxHeight: 20,
-        marginLeft: 20,
-        marginBottom: 5,
-    },
-
-
-});
+// const styles = StyleSheet.create({
+//     mainContainer: {
+//         flex: 1,
+//         backgroundColor: '#02295F',
+//     },
+//     logoContainer: {
+//         maxHeight: '10%',
+//     },
+//     logoImg: {
+//         width: '100%',
+//         height: '100%',
+//     },
+//     inputText: {
+//         backgroundColor: 'white',
+//         width: '64%',
+//         borderBottomWidth: 1,
+//         marginBottom: '2%',
+//
+//     },
+//     inputTextContainer: {
+//         alignItems: 'center',
+//         marginTop: '2.8%',
+//     },
+//     confirmButton: {
+//         alignItems: 'center',
+//         paddingVertical: 12,
+//         paddingHorizontal: 32,
+//         borderRadius: 20,
+//         width: 150,
+//         elevation: 3,
+//         backgroundColor: 'white',
+//         borderWidth: 2,
+//         marginTop: '1.65%',
+//     },
+//     textButton: {
+//         fontSize: 16,
+//         lineHeight: 21,
+//         fontWeight: 'bold',
+//         letterSpacing: 0.25,
+//         color: '#02295F',
+//     },
+//     dropDownMenu: {
+//         backgroundColor: 'white',
+//         minWidth: '64%',
+//         maxHeight: '5.6%',
+//         marginBottom: '1.65%',
+//     },
+//
+//
+// });
 export default NewAccountScreen;

@@ -1,83 +1,150 @@
 /* eslint-disable */
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import SafeAreaView from 'react-native/Libraries/Components/SafeAreaView/SafeAreaView';
-import {Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
+import {ScrollView, Text, TextInput, TouchableOpacity, View} from 'react-native';
 import {firebase} from '@react-native-firebase/app';
 import '@react-native-firebase/auth';
 import '@react-native-firebase/firestore';
 import {useDispatch, useSelector} from 'react-redux';
-import {initiateTransactionThunk} from './redux/slices/transactionSlice';
+import {initiateTransaction} from './redux/slices/transactionSlice';
+import {Logo, styles} from './stylesExports';
 
 const DepositScreen = ({navigation}) => {
-    // const {accountNum} = route.params;
-    const testing = useSelector(state => state.accountsReducer.accountNumber);
+    const accountNumber = useSelector(state => state.accountsReducer.accountNumber);
+    const [checkError, setCheckError] = useState('');
+    const [depositError, setDepositError] = useState('');
+    const [numberError, setNumberError] = useState('');
     const dispatch = useDispatch();
 
-    const [recipientUser, setRecipientUser] = useState({
-        firstName: '',
-        lastName: '',
-        accountNumber: '',
-        sendAmount: 0,
-        // currentAccountNumber: accountNum,
-
+    const [deposit, setDeposit] = useState({
+        checkNumber: 0,
+        confirmCheckNumber: 0,
+        depositAmount: 0,
+        currentAccountNumber: accountNumber,
+        transactionType: 'Deposit',
     });
 
-    useEffect(() => {
-        console.log('depscreen: ' + testing);
-    });
+    const confirmInput = () => {
+        console.log('test');
+        const numbersRegex = /^[0-9]+$/;
 
-    // useEffect(() => {
-    //     let testing = dispatch(getAccountNumber());
-    //     console.log('sendMonAcc: ' + testing);
-    // });
+        if ((deposit.checkNumber === deposit.confirmCheckNumber) && (deposit.checkNumber.length === 10 && deposit.confirmCheckNumber.length === 10)
+            && (numbersRegex.test(deposit.checkNumber) && numbersRegex.test(deposit.confirmCheckNumber))) {
+            dispatch(initiateTransaction(deposit));
+            alert('Deposit Successful!');
+        }
 
-    // useEffect(() => {
-    //     console.log('sendMon Acc: ' + getAccountNumber());
-    // }, [dispatch()]);
+        if (deposit.checkNumber !== deposit.confirmCheckNumber) {
+            setCheckError('Check numbers must match!');
+        }
+        if (deposit.checkNumber.length < 10 || deposit.confirmCheckNumber < 10) {
+            setCheckError('Check numbers must have 10 digits!');
+        }
+        if (!(numbersRegex.test(deposit.checkNumber)) || !(numbersRegex.test(deposit.confirmCheckNumber))) {
+            setCheckError('Check numbers must only have digits!');
+        }
+        if (deposit.depositAmount <= 0) {
+            setDepositError('Deposit amount must be greater than 0!');
+        }
+
+
+        // if (numbersRegex.test(deposit.checkNumber && deposit.confirmCheckNumber)) {
+        //     alert('all numbers');
+        // } else {
+        //     alert('letters');
+        // }
+
+
+        // if (deposit.checkNumber === deposit.confirmCheckNumber) {
+        //     initiateTransaction(deposit);
+        //     alert('Deposit Successful!');
+        // } else {
+        //     setCheckError('Check Numbers Must Match!');
+        // }
+
+        // if ((deposit.checkNumber === deposit.confirmCheckNumber) && (deposit.depositAmount > 0)) {
+        //     initiateTransaction(deposit);
+        // }
+        // if (deposit.checkNumber !== deposit.confirmCheckNumber) {
+        //     setCheckError('Check Numbers Must Match!');
+        // }
+
+        //     if (deposit.depositAmount <= 0) {
+        //         setDepositError('Deposit Amount Must Be Greater Than 0');
+        //     }
+        //
+        //
+        // const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,15}$/;
+        // if (passwordRegex.test(deposit.checkNumber)) {
+        //     setCheckError('no error');
+        // } else {
+        //     setCheckError('error');
+        // }
+
+
+    };
 
     const changeTextInput = (key, value) => {
-        setRecipientUser({
-            ...recipientUser,
+        setDeposit({
+            ...deposit,
             [key]: value,
         }, []);
     };
+
     return (
         <SafeAreaView style={styles.mainContainer}>
-            <View style={styles.logoContainer}>
-                <Image style={styles.logoImg} source={require('../BankBaseMobile/images/BankBaseLogo.png')}/>
-            </View>
-
+            {/*<View style={styles.logoContainer}>*/}
+            {/*    <Image style={styles.logoImg} source={require('../BankBaseMobile/images/BankBaseLogo.png')}/>*/}
+            {/*</View>*/}
+            <Logo/>
             <ScrollView contentContainerStyle={styles.scrollContainer}>
                 <View style={styles.inputTextContainer}>
                     <TextInput
-                        placeholder={'First Name'}
+                        placeholder={'Check Number'}
+                        keyboardType={'number-pad'}
+                        maxLength={10}
                         style={styles.inputText}
-                        onChangeText={text => changeTextInput('firstName', text)}
+                        onChangeText={text => changeTextInput('checkNumber', text)}
                     />
                     <TextInput
-                        placeholder={'Last Name'}
+                        placeholder={'Confirm Check Number'}
+                        keyboardType={'number-pad'}
+                        maxLength={10}
                         style={styles.inputText}
-                        onChangeText={text => changeTextInput('lastName', text)}
+                        onChangeText={text => changeTextInput('confirmCheckNumber', text)}
                     />
+                    {!!checkError && (
+                        <Text style={{
+                            color: 'red',
+                            fontSize: 14,
+                            marginBottom: 8,
+                            fontWeight: 'bold',
+                        }}>{checkError}</Text>
+                    )}
                     <TextInput
-                        placeholder={'Account Number'}
+                        placeholder={'Amount to Deposit'}
+                        keyboardType={'number-pad'}
                         style={styles.inputText}
-                        onChangeText={text => changeTextInput('accountNumber', text)}
+                        onChangeText={text => changeTextInput('depositAmount', text)}
                     />
-                    <TextInput
-                        placeholder={'Amount to Send'}
-                        style={styles.inputText}
-                        onChangeText={text => changeTextInput('sendAmount', text)}
-                    />
-                    <TouchableOpacity style={styles.sendButton} onPress={() => {
-                        dispatch(initiateTransactionThunk(recipientUser));
-                    }}>
-                        <Text style={styles.textButton}>Send</Text>
+                    {!!depositError && (
+                        <Text style={{
+                            color: 'red',
+                            fontSize: 14,
+                            fontWeight: 'bold',
+                            marginBottom: 8,
+                        }}>{depositError}</Text>
+                    )}
+                    {/*<TouchableOpacity style={styles.depositButton} onPress={() => {*/}
+                    {/*    dispatch(initiateTransaction(deposit));*/}
+                    {/*}}>*/}
+
+                    <TouchableOpacity style={styles.submitButton} onPress={() => confirmInput()}>
+                        <Text style={styles.textButton}>Deposit</Text>
                     </TouchableOpacity>
                 </View>
-                {/*<Text style={{color: 'white'}}>{}</Text>*/}
-
             </ScrollView>
+
 
             <View style={styles.bottomBarContainer}>
                 <TouchableOpacity onPress={() => firebase.auth().signOut()}>
@@ -94,58 +161,67 @@ const DepositScreen = ({navigation}) => {
     );
 };
 
-const styles = StyleSheet.create({
-    mainContainer: {
-        flex: 1,
-        backgroundColor: '#02295F',
-    },
-    scrollContainer: {
-        flex: 1,
-        justifyContent: 'center',
-    },
-    bottomBarText: {
-        color: 'white',
-        fontSize: 18,
-    },
-    bottomBarContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 10,
-        marginHorizontal: 10,
-    },
-    logoImg: {
-        width: 425,
-        height: 80,
-    },
-    inputTextContainer: {
-        flex: 1,
-        alignItems: 'center',
-        marginTop: 30,
-    },
-    inputText: {
-        backgroundColor: 'white',
-        width: 250,
-        marginLeft: 20,
-        borderBottomWidth: 1,
-        marginBottom: 7,
-    },
-    sendButton: {
-        alignItems: 'center',
-        paddingVertical: 12,
-        paddingHorizontal: 32,
-        borderRadius: 20,
-        width: 150,
-        elevation: 3,
-        backgroundColor: 'white',
-        borderWidth: 2,
-    },
-    textButton: {
-        fontSize: 16,
-        lineHeight: 21,
-        fontWeight: 'bold',
-        letterSpacing: 0.25,
-        color: '#02295F',
-    },
-});
+// const styles = StyleSheet.create({
+//     mainContainer: {
+//         flex: 1,
+//         backgroundColor: '#02295F',
+//     },
+//     scrollContainer: {
+//         flex: 1,
+//         justifyContent: 'center',
+//     },
+//     bottomBarText: {
+//         color: 'white',
+//         fontSize: 18,
+//     },
+//     bottomBarContainer: {
+//         flexDirection: 'row',
+//         justifyContent: 'space-between',
+//         marginBottom: 10,
+//         marginHorizontal: 10,
+//     },
+//     logoContainer: {
+//         maxHeight: '10%',
+//     },
+//     logoImg: {
+//         width: '100%',
+//         height: '100%',
+//     },
+//     inputTextContainer: {
+//         flex: 1,
+//         alignItems: 'center',
+//         marginTop: 30,
+//     },
+//     inputText: {
+//         backgroundColor: 'white',
+//         width: '64%',
+//         borderBottomWidth: 1,
+//         marginBottom: 7,
+//     },
+//     depositButton: {
+//         alignItems: 'center',
+//         paddingVertical: 12,
+//         paddingHorizontal: 32,
+//         borderRadius: 20,
+//         width: '40%',
+//         elevation: 3,
+//         backgroundColor: 'white',
+//         borderWidth: 2,
+//     },
+//     textButton: {
+//         fontSize: 16,
+//         lineHeight: 21,
+//         fontWeight: 'bold',
+//         letterSpacing: 0.25,
+//         color: '#02295F',
+//     },
+//     inputValidatorContainer: {
+//         backgroundColor: 'gray',
+//         minHeight: 150,
+//         minWidth: 250,
+//
+//     },
+//
+// });
 
 export default DepositScreen;

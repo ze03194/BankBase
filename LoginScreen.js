@@ -48,11 +48,13 @@ const LoginScreen = ({navigation}) => {
                     </TouchableOpacity>
                     <Text style={styles.promptText}>Forgot Password</Text>
                 </View>
-
-                <TouchableOpacity style={styles.loginButton} onPress={() => dispatch(getLogin(userCredential))}>
-                    <Text style={styles.textButton}>Login</Text>
-                </TouchableOpacity>
+                <View>
+                    <TouchableOpacity style={styles.loginButton} onPress={() => dispatch(getLogin(userCredential))}>
+                        <Text style={styles.textButton}>Login</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
+
         </View>
     );
 };

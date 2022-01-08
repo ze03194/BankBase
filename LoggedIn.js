@@ -1,50 +1,44 @@
 /* eslint-disable prettier/prettier,no-trailing-spaces */
 import React, {useEffect} from 'react';
-import {FlatList, Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {FlatList, Text, TouchableOpacity, View} from 'react-native';
 import {firebase} from '@react-native-firebase/app';
 import '@react-native-firebase/auth';
 import '@react-native-firebase/firestore';
 import SafeAreaView from 'react-native/Libraries/Components/SafeAreaView/SafeAreaView';
 import {useDispatch, useSelector} from 'react-redux';
-import {getUser} from './redux/slices/userDataSlice';
 import {getAccounts, setAccountNumber} from './redux/slices/accountsSlice';
+import {useIsFocused} from '@react-navigation/native';
+import {getUser} from './redux/slices/userDataSlice';
+import {Logo, styles} from './stylesExports';
 
 // const db = firebase.firestore();
 // const auth = firebase.auth();
 // const Stack = createNativeStackNavigator();
 
-const LoggedInScreen = ({navigation}) => {
+const LoggedInScreen = ({navigation}, props) => {
     const user = useSelector(state => state.userDataReducer.currentUser);
     const accounts = useSelector(state => state.accountsReducer.accounts);
     const dispatch = useDispatch();
+    const isFocused = useIsFocused();
 
     useEffect(() => {
-        // console.log('accountNum: ' + accountNumber);
-        dispatch(getUser());
         dispatch(getAccounts());
-    }, [dispatch]);
-
+        dispatch(getUser());
+    }, [dispatch, isFocused]);
+    
     return (
         <SafeAreaView style={styles.mainContainer}>
-            <View style={styles.logoContainer}>
-                <Image style={styles.logoImg} source={require('../BankBaseMobile/images/BankBaseLogo.png')}/>
-            </View>
 
+            <Logo/>
             <Text style={styles.welcomeText}>Welcome, {user.firstName}!</Text>
-
-            <View style={styles.accountBoxContainer}>
-                <View style={styles.accountsDisplayContainer}>
+            <View style={styles.flatListContainer}>
+                <View style={styles.topFlatList}>
                     <Text style={{color: 'white', alignSelf: 'center', marginVertical: 15}}>Accounts</Text>
-                    <View style={styles.accountsFlatList}>
+                    <View style={styles.flatListBackground}>
                         <FlatList
                             data={accounts}
                             renderItem={({item}) => (
-                                <View style={styles.accountsDisplay}>
-                                    {/*<TouchableOpacity onPress={() => {*/}
-                                    {/*    navigation.navigate('Accounts', {*/}
-                                    {/*        accountNum: item.accountNumber,*/}
-                                    {/*    });*/}
-                                    {/*}}>*/}
+                                <View style={styles.flatListDisplay}>
                                     <TouchableOpacity onPress={() => {
                                         const accountNum = item.accountNumber;
                                         dispatch(setAccountNumber({accountNum}));
@@ -52,7 +46,7 @@ const LoggedInScreen = ({navigation}) => {
                                     }}>
                                         <View style={styles.accountsTextContainer}>
                                             <Text
-                                                style={styles.accountsText}>...{item.accountNumber.toString().substring(4)} - {item.accountType}</Text>
+                                                style={styles.flatListText}>...{item.accountNumber.toString().substring(4)} - {item.accountType}</Text>
                                         </View>
                                     </TouchableOpacity>
                                 </View>
@@ -61,7 +55,7 @@ const LoggedInScreen = ({navigation}) => {
                     {/*</View>*/}
                 </View>
             </View>
-            <View style={styles.bottomNavBar}>
+            <View style={styles.middleNavBar}>
                 <TouchableOpacity
                     onPress={() => navigation.navigate('NewAccount')}>
                     <Text style={{color: 'white', fontSize: 18}}>Open New Account</Text>
@@ -79,89 +73,76 @@ const LoggedInScreen = ({navigation}) => {
     );
 };
 
-const styles = StyleSheet.create({
-    mainContainer: {
-        flex: 1,
-        backgroundColor: '#02295F',
-    },
-    scrollContainer: {},
-    welcomeText: {
-        color: 'white',
-        marginTop: 20,
-        marginLeft: 10,
-        fontSize: 25,
-    },
-    bottomBarText: {
-        color: 'white',
-        fontSize: 18,
-    },
-    bottomBarContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 10,
-        marginHorizontal: 10,
-    },
-    logoImg: {
-        width: 425,
-        height: 80,
-    },
-    accountBoxContainer: {
-        minWidth: 250,
-        minHeight: 250,
-        backgroundColor: 'white',
-        marginTop: 10,
-
-    },
-    accountsDisplayContainer: {
-        minWidth: 300,
-        maxWidth: 300,
-        minHeight: 50,
-        marginTop: 20,
-        backgroundColor: '#02295F',
-        alignSelf: 'center',
-        borderWidth: 1,
-    },
-    accountsListBox: {
-        minWidth: 300,
-        maxWidth: 300,
-        minHeight: 250,
-        maxHeight: 250,
-        backgroundColor: 'white',
-        marginTop: 15,
-        // borderLeftWidth: 1,
-        // borderRightWidth: 1,
-        // borderBottomWidth: 1,
-    },
-    bottomNavBar: {
-        flex: 1,
-        flexDirection: 'row',
-        justifyContent: 'space-evenly',
-        marginTop: 10,
-    },
-    accountsDisplay: {
-        flex: 1,
-        borderTopWidth: 1.5,
-        // minHeight: 75,
-        // maxHeight: 80,
-    },
-    accountsFlatList: {
-        // minWidth: 300,
-        // maxWidth: 300,
-        maxHeight: 250,
-        backgroundColor: 'white',
-        // borderWidth: 1,
-        // borderLeftWidth: 1,
-        // borderRightWidth: 1,
-        // borderBottomWidth: 1,
-    },
-    accountsText: {
-        color: 'black',
-        fontWeight: 'bold',
-    },
-    accountsTextContainer: {
-        minHeight: 60,
-    },
-
-
-});
+// const styles = StyleSheet.create({
+//     mainContainer: {
+//         flex: 1,
+//         backgroundColor: '#02295F',
+//     },
+//     scrollContainer: {},
+//     welcomeText: {
+//         color: 'white',
+//         marginTop: '5%',
+//         marginLeft: '2.5%',
+//         fontSize: 25,
+//     },
+//     bottomBarText: {
+//         color: 'white',
+//         fontSize: 18,
+//     },
+//     bottomBarContainer: {
+//         flexDirection: 'row',
+//         justifyContent: 'space-between',
+//         marginBottom: '2.5%',
+//         marginHorizontal: '2.5%',
+//     },
+//     logoContainer: {
+//         maxHeight: '10%',
+//     },
+//     logoImg: {
+//         width: '100%',
+//         height: '100%',
+//
+//     },
+//     flatListContainer: {
+//         // minWidth: 250,
+//         // minHeight: 250,
+//         minWidth: '100%',
+//         minHeight: '30%',
+//         backgroundColor: 'white',
+//         marginTop: '2.5%',
+//
+//     },
+//     topFlatList: {
+//         minWidth: '75%',
+//         maxWidth: '75%',
+//         minHeight: '10%',
+//         marginTop: '5%',
+//         backgroundColor: '#02295F',
+//         alignSelf: 'center',
+//         borderWidth: 1,
+//     },
+//     middleNavBar: {
+//         flex: 1,
+//         flexDirection: 'row',
+//         justifyContent: 'center',
+//         marginTop: '5%',
+//     },
+//     flatListDisplay: {
+//         flex: 1,
+//         borderTopWidth: 1.5,
+//         // minHeight: 75,
+//         // maxHeight: 80,
+//     },
+//     flatListBackground: {
+//         backgroundColor: 'white',
+//     },
+//     accountsText: {
+//         color: 'black',
+//         fontWeight: 'bold',
+//     },
+//     accountsTextContainer: {
+//         minHeight: 60,
+//     },
+//
+// });
 export default LoggedInScreen;

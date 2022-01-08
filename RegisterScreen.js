@@ -2,22 +2,32 @@
 import React, {useState} from 'react';
 import 'intl';
 import 'intl/locale-data/jsonp/en-US';
-import {Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
+import {ScrollView, Text, TextInput, TouchableOpacity} from 'react-native';
 import SafeAreaView from 'react-native/Libraries/Components/SafeAreaView/SafeAreaView';
 import {firebase} from '@react-native-firebase/app';
 import '@react-native-firebase/auth';
 import '@react-native-firebase/firestore';
 import {addUser} from './redux/slices/userDataSlice';
 import {useDispatch} from 'react-redux';
+import {Logo, styles} from './stylesExports';
 
 
 const db = firebase.firestore();
 const auth = firebase.auth();
+
 const RegisterScreen = () => {
-        // const accNum = Math.floor(10000000 + Math.random() * 99999999);
+        const [passwordError, setPasswordError] = useState('');
+        const [emailError, setEmailError] = useState('');
+        const [firstNameError, setFirstNameError] = useState('');
+        const [lastNameError, setLastNameError] = useState('');
+        const [address1Error, setAddress1Error] = useState('');
+        const [address2Error, setAddress2Error] = useState('');
+        const [cityError, setCityError] = useState('');
+        const [stateError, setStateError] = useState('');
+        const [zipCodeError, setZipCodeError] = useState('');
+        const [securityPinError, setSecurityPinError] = useState('');
 
         const dispatch = useDispatch();
-
 
         const [registration, setRegistration] = useState({
             password: '',
@@ -30,9 +40,77 @@ const RegisterScreen = () => {
             state: '',
             zipCode: '',
             securityPin: '',
-            // balance: Math.floor(10000 + Math.random() * 99999),
-            // accNum: Math.floor(10000000 + Math.random() * 99999999),
         });
+
+        const validateInput = () => {
+
+            const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,15}$/;
+            const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+            const lettersRegex = /^[A-Za-z]+$/;
+            const numbersRegex = /^[0-9]+$/;
+            let inputValidated = true;
+
+            if (!(emailRegex.test(registration.emailAddress)) || registration.emailAddress === '') {
+                setEmailError('Invalid Email Address!');
+                inputValidated = false;
+            } else {
+                setEmailError('');
+            }
+
+            if (!passwordRegex.test(registration.password)) {
+                setPasswordError('Password must be between 8-15 characters with at least one lowercase, one uppercase' +
+                    'one digit, and one special character!');
+                inputValidated = false;
+            } else {
+                setPasswordError('');
+            }
+
+            if (!(lettersRegex.test(registration.firstName)) || registration.firstName.length < 2 || registration.firstName === '') {
+                setFirstNameError('Invalid name!');
+                inputValidated = false;
+            } else {
+                setFirstNameError('');
+            }
+            if (!(lettersRegex.test(registration.lastName)) || registration.lastName.length < 2 || registration.lastName === '') {
+                setLastNameError('Invalid name!');
+                inputValidated = false;
+            } else {
+                setLastNameError('');
+            }
+            if (registration.address1.length < 4) {
+                setAddress1Error('Invalid Address!');
+            } else {
+                setAddress1Error('');
+            }
+            if (!(lettersRegex.test(registration.city)) || registration.city.length < 2) {
+                setCityError('Invalid city!');
+                inputValidated = false;
+            } else {
+                setCityError('');
+            }
+            if (!(lettersRegex.test(registration.state)) || registration.state.length < 2) {
+                setStateError('Invalid state!');
+                inputValidated = false;
+            } else {
+                setStateError('');
+            }
+            if (!(numbersRegex.test(registration.zipCode)) || registration.zipCode.length < 5) {
+                setZipCodeError('Invalid zipcode!');
+                inputValidated = false;
+            } else {
+                setZipCodeError('');
+            }
+            if (!(numbersRegex.test(registration.securityPin)) || registration.securityPin.length < 6) {
+                setSecurityPinError('Security pin must be 6 digits!');
+                inputValidated = false;
+            } else {
+                setSecurityPinError('');
+            }
+
+            if (inputValidated) {
+                dispatch(addUser({newUser: registration}));
+            }
+        };
 
         const changeTextInput = (key, value) => {
             setRegistration({
@@ -42,11 +120,9 @@ const RegisterScreen = () => {
         };
 
         return (
-            <SafeAreaView style={styles.registerContainer}>
-                <View style={styles.logoContainer}>
-                    <Image style={styles.logoImg} source={require('../BankBaseMobile/images/BankBaseLogo.png')}/>
-                </View>
-                <Text style={{color: 'white', fontSize: 15, marginTop: 20, alignSelf: 'center'}}>Registration Form</Text>
+            <SafeAreaView style={styles.mainContainer}>
+                <Logo/>
+                <Text style={{color: 'white', fontSize: 15, marginTop: 10, alignSelf: 'center'}}>Registration Form</Text>
                 <ScrollView contentContainerStyle={styles.inputTextContainer}>
                     <TextInput
                         placeholder="Email Address"
@@ -54,6 +130,9 @@ const RegisterScreen = () => {
                         value={registration.emailAddress}
                         onChangeText={text => changeTextInput('emailAddress', text)}
                     />
+                    {!!emailError && (
+                        <Text style={styles.errorTexts}>{emailError}</Text>
+                    )}
                     <TextInput
                         placeholder="Password"
                         style={styles.inputText}
@@ -61,107 +140,148 @@ const RegisterScreen = () => {
                         secureTextEntry={true}
                         onChangeText={text => changeTextInput('password', text)}
                     />
+                    {!!passwordError && (
+                        <Text style={styles.errorTexts}>{passwordError}</Text>
+                    )}
                     <TextInput
                         placeholder="First Name"
                         style={styles.inputText}
                         value={registration.firstName}
                         onChangeText={text => changeTextInput('firstName', text)}
                     />
+                    {!!firstNameError && (
+                        <Text style={styles.errorTexts}>{firstNameError}</Text>
+                    )}
                     <TextInput
                         placeholder="Last Name"
                         style={styles.inputText}
                         value={registration.lastName}
                         onChangeText={text => changeTextInput('lastName', text)}
                     />
+                    {!!lastNameError && (
+                        <Text style={styles.errorTexts}>{lastNameError}</Text>
+                    )}
                     <TextInput
                         placeholder="Address1"
                         style={styles.inputText}
                         value={registration.address1}
                         onChangeText={text => changeTextInput('address1', text)}
                     />
+                    {!!address1Error && (
+                        <Text style={styles.errorTexts}>{address1Error}</Text>
+                    )}
                     <TextInput
                         placeholder="Address2"
                         style={styles.inputText}
                         value={registration.address2}
                         onChangeText={text => changeTextInput('address2', text)}
                     />
+                    {!!address2Error && (
+                        <Text style={styles.errorTexts}>{address2Error}</Text>
+                    )}
                     <TextInput
                         placeholder="City"
                         style={styles.inputText}
                         value={registration.city}
                         onChangeText={text => changeTextInput('city', text)}
                     />
+                    {!!cityError && (
+                        <Text style={styles.errorTexts}>{cityError}</Text>
+                    )}
                     <TextInput
                         placeholder="State"
                         style={styles.inputText}
                         value={registration.state}
                         onChangeText={text => changeTextInput('state', text)}
                     />
+                    {!!stateError && (
+                        <Text style={styles.errorTexts}>{stateError}</Text>
+                    )}
                     <TextInput
                         placeholder="Zipcode"
                         style={styles.inputText}
+                        keyboardType={'number-pad'}
                         value={registration.zipCode}
+                        maxLength={5}
                         onChangeText={text => changeTextInput('zipCode', text)}
                     />
+                    {!!zipCodeError && (
+                        <Text style={styles.errorTexts}>{zipCodeError}</Text>
+                    )}
                     <TextInput
                         placeholder="Security Pin"
+                        keyboardType={'number-pad'}
                         style={styles.inputText}
                         value={registration.securityPin}
                         secureTextEntry={true}
+                        maxLength={6}
                         onChangeText={text => changeTextInput('securityPin', text)}
                     />
-                    <TouchableOpacity style={styles.registerButton} onPress={() => {
-                        dispatch(addUser({newUser: registration}));
-                    }}>
+                    {!!securityPinError && (
+                        <Text style={styles.errorTexts}>{securityPinError}</Text>
+                    )}
+                    <TouchableOpacity style={styles.submitButton} onPress={() => validateInput()}>
                         <Text style={styles.textButton}>Register</Text>
                     </TouchableOpacity>
+
                 </ScrollView>
             </SafeAreaView>
         );
     }
 ;
 
-const styles = StyleSheet.create({
-    registerContainer: {
-        flex: 1,
-        backgroundColor: '#02295F',
-    },
-    logoImg: {
-        width: 425,
-        height: 80,
-    },
-    inputText: {
-        backgroundColor: 'white',
-        width: 250,
-        marginLeft: 20,
-        borderBottomWidth: 1,
-        marginBottom: 7,
-
-    },
-    inputTextContainer: {
-        alignItems: 'center',
-        marginTop: 15,
-    },
-    registerButton: {
-        alignItems: 'center',
-        paddingVertical: 12,
-        paddingHorizontal: 32,
-        borderRadius: 20,
-        width: 150,
-        elevation: 3,
-        backgroundColor: 'white',
-        borderWidth: 2,
-    },
-    textButton: {
-        fontSize: 16,
-        lineHeight: 21,
-        fontWeight: 'bold',
-        letterSpacing: 0.25,
-        color: '#02295F',
-    },
-
-
-});
+// const styles = StyleSheet.create({
+//     mainContainer: {
+//         flex: 1,
+//         backgroundColor: '#02295F',
+//     },
+//     logoContainer: {
+//         maxHeight: '10%',
+//         minWidth: '100%',
+//     },
+//     logoImg: {
+//         width: '100%',
+//         height: '100%',
+//     },
+//     inputText: {
+//         backgroundColor: 'white',
+//         width: '64%',
+//         borderBottomWidth: 1,
+//         marginBottom: '2%',
+//
+//     },
+//     inputTextContainer: {
+//         alignItems: 'center',
+//         // marginTop: 15,
+//         marginTop: '2.5%',
+//     },
+//     registerButton: {
+//         alignItems: 'center',
+//         paddingVertical: 12,
+//         paddingHorizontal: 32,
+//         borderRadius: 20,
+//         width: '40%',
+//         elevation: 3,
+//         backgroundColor: 'white',
+//         borderWidth: 2,
+//         marginBottom: '5%',
+//     },
+//     textButton: {
+//         fontSize: 16,
+//         lineHeight: 21,
+//         fontWeight: 'bold',
+//         letterSpacing: 0.25,
+//         color: '#02295F',
+//     },
+//     errorTexts: {
+//         color: 'red',
+//         fontSize: 14,
+//         marginBottom: '2%',
+//         fontWeight: 'bold',
+//     },
+//
+//
+// });
 
 export default RegisterScreen;
 

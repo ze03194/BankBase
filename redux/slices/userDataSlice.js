@@ -38,6 +38,9 @@ export const getLogin = createAsyncThunk(
         await auth.signInWithEmailAndPassword(userCredentials.emailAddress, userCredentials.password)
             .then(result => {
                 console.log(result);
+            })
+            .catch((error) => {
+                alert(error);
             });
     },
 );
@@ -81,7 +84,7 @@ const userDataSlice = createSlice({
                     // });
                 })
                 .catch(error => {
-                    console.log(error);
+                    alert(error);
                 });
         },
     },

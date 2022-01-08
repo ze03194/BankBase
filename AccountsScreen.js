@@ -1,6 +1,6 @@
 /* eslint-disable */
 import React, {useEffect} from 'react';
-import {FlatList, Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {Dimensions, FlatList, Text, TouchableOpacity, View} from 'react-native';
 import {firebase} from '@react-native-firebase/app';
 import '@react-native-firebase/auth';
 import '@react-native-firebase/firestore';
@@ -8,7 +8,10 @@ import SafeAreaView from 'react-native/Libraries/Components/SafeAreaView/SafeAre
 import {useDispatch, useSelector} from 'react-redux';
 import {getTransactions} from './redux/slices/accountsSlice';
 import {getBalance} from './redux/slices/userDataSlice';
+import {Logo, styles} from './stylesExports';
 
+let width = Dimensions.get('window').width;
+let height = Dimensions.get('window').height;
 
 const AccountsScreen = ({navigation, route}) => {
 
@@ -17,6 +20,7 @@ const AccountsScreen = ({navigation, route}) => {
     const currentBalance = useSelector(state => state.userDataReducer.balance);
     const accountNum = useSelector(state => state.accountsReducer.accountNumber);
     const dispatch = useDispatch();
+
 
     useEffect(() => {
         console.log('accScreen: ' + accountNum);
@@ -38,24 +42,23 @@ const AccountsScreen = ({navigation, route}) => {
 
     return (
         <SafeAreaView style={styles.mainContainer}>
-            <View style={styles.logoContainer}>
-                <Image style={styles.logoImg} source={require('../BankBaseMobile/images/BankBaseLogo.png')}/>
-            </View>
-            <View style={styles.transactionsContainer}>
+
+            <Logo/>
+            <View style={styles.flatListContainer}>
                 <Text style={styles.accountBalanceText}>Balance: {formatMoney(parseInt(currentBalance))}</Text>
-                <View style={styles.topTransactionBox}>
-                    <Text style={{color: 'white', alignSelf: 'center', marginTop: 15}}>Recent Transactions</Text>
-                    <View style={styles.transactionFlatList}>
+                <View style={styles.topFlatList}>
+                    <Text style={{color: 'white', alignSelf: 'center', marginVertical: 15}}>Recent Transactions</Text>
+                    <View style={styles.flatListBackground}>
                         <FlatList
                             data={transactions}
                             renderItem={({item}) => (
-                                <View style={styles.transactionDisplay}>
+                                <View style={styles.flatListDisplay}>
                                     <Text
-                                        style={styles.transactionText}>{item.transferStatus}: {formatMoney(parseInt(item.amount))}</Text>
+                                        style={styles.flatListText}>{item.transactionStatus}: {formatMoney(parseInt(item.amount))}</Text>
                                     <Text
-                                        style={styles.transactionText}>{getWord(item.transferStatus)}: {item.firstName} {item.lastName} </Text>
+                                        style={styles.flatListText}>{getWord(item.transactionStatus)}: {item.firstName} {item.lastName} </Text>
                                     <Text
-                                        style={styles.transactionText}>Balance: {formatMoney(parseInt(item.balance))}</Text>
+                                        style={styles.flatListText}>Balance: {formatMoney(parseInt(item.balance))}</Text>
                                 </View>
                             )}/>
                     </View>
@@ -68,11 +71,11 @@ const AccountsScreen = ({navigation, route}) => {
                             accountNum: accountNum,
                         });
                     }}>
-                    <Text style={styles.accountOptionsText}>Send Money</Text>
+                    <Text style={styles.optionsText}>Send Money</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     onPress={() => navigation.navigate('Deposit')}>
-                    <Text style={styles.accountOptionsText}>Deposit</Text>
+                    <Text style={styles.optionsText}>Deposit</Text>
                 </TouchableOpacity>
             </View>
 
@@ -90,83 +93,90 @@ const AccountsScreen = ({navigation, route}) => {
         </SafeAreaView>
     );
 };
-const styles = StyleSheet.create({
-    mainContainer: {
-        flex: 1,
-        backgroundColor: '#02295F',
-    },
-    scrollContainer: {},
-    welcomeText: {
-        color: 'white',
-        marginTop: 20,
-        marginLeft: 15,
-        fontSize: 25,
-    },
-    bottomBarText: {
-        color: 'white',
-        fontSize: 18,
-    },
-    bottomBarContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 10,
-        marginHorizontal: 10,
-    },
-    logoImg: {
-        width: 425,
-        height: 80,
-    },
-    transactionsContainer: {
-        minHeight: 270,
-        backgroundColor: 'white',
-        marginTop: 10,
-    },
-    topTransactionBox: {
-        minWidth: 300,
-        maxWidth: 300,
-        minHeight: 50,
-        marginTop: 20,
-        backgroundColor: '#02295F',
-        alignSelf: 'center',
-    },
-    transactionDisplay: {
-        flex: 1,
-        borderTopWidth: 1.5,
-        minHeight: 75,
-        maxHeight: 80,
-    },
-    transactionFlatList: {
-        minWidth: 300,
-        maxWidth: 300,
-        minHeight: 150,
-        maxHeight: 150,
-        backgroundColor: 'white',
-        marginTop: 15,
-        borderLeftWidth: 1,
-        borderRightWidth: 1,
-        borderBottomWidth: 1,
-    },
-    transactionText: {
-        color: 'black',
-        fontWeight: 'bold',
-    },
-    accountBalanceText: {
-        color: 'black',
-        fontWeight: 'bold',
-        marginLeft: 5,
-    },
-    accountOptionsContainer: {
-        flex: 1,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginTop: 10,
-        marginHorizontal: 10,
-    },
-    accountOptionsText: {
-        color: 'white',
-        fontSize: 18,
-    },
-
-});
+// const styles = StyleSheet.create({
+//     mainContainer: {
+//         flex: 1,
+//         backgroundColor: '#02295F',
+//     },
+//     scrollContainer: {},
+//     welcomeText: {
+//         color: 'white',
+//         marginTop: 20,
+//         marginLeft: 15,
+//         fontSize: 25,
+//     },
+//     bottomBarText: {
+//         color: 'white',
+//         fontSize: 18,
+//     },
+//     bottomBarContainer: {
+//         flexDirection: 'row',
+//         justifyContent: 'space-between',
+//         marginBottom: 10,
+//         marginHorizontal: 10,
+//     },
+//     logoContainer: {
+//         // width: '100%',
+//         maxHeight: '10%',
+//     },
+//     logoImg: {
+//         width: '100%',
+//         height: '100%',
+//     },
+//
+//     flatListContainer: {
+//         // minWidth: 250,
+//         // minHeight: 250,
+//         minWidth: '100%',
+//         minHeight: '30%',
+//         backgroundColor: 'white',
+//         marginTop: '2.5%',
+//
+//     },
+//
+//     flatListDisplay: {
+//         flex: 1,
+//         borderTopWidth: 1.5,
+//
+//     },
+//
+//     flatListText: {
+//         color: 'black',
+//         fontWeight: 'bold',
+//     },
+//     accountBalanceText: {
+//         color: 'black',
+//         fontWeight: 'bold',
+//         marginLeft: 5,
+//     },
+//     accountOptionsContainer: {
+//         flex: 1,
+//         flexDirection: 'row',
+//         justifyContent: 'space-between',
+//         marginTop: 10,
+//         marginHorizontal: 10,
+//     },
+//     optionsText: {
+//         color: 'white',
+//         fontSize: 18,
+//     },
+//     accountsDisplay: {
+//         flex: 1,
+//         borderTopWidth: 1.5,
+//     },
+//     flatListBackground: {
+//         backgroundColor: 'white',
+//     },
+//     topFlatList: {
+//         minWidth: '75%',
+//         maxWidth: '75%',
+//         minHeight: '10%',
+//         marginTop: '5%',
+//         backgroundColor: '#02295F',
+//         alignSelf: 'center',
+//         borderWidth: 1,
+//     },
+//
+// });
 
 export default AccountsScreen;
