@@ -6,24 +6,6 @@ import '@react-native-firebase/firestore';
 const db = firebase.firestore();
 const auth = firebase.auth();
 
-// export const getTransactions = createAsyncThunk(
-//     'transactions/getTransactions',
-//     async () => {
-//         return await db.collection('transactions').where('userID', '==', auth.currentUser.uid).get()
-//             .then(querySnapshot => {
-//                 const transactions = [];
-//                 querySnapshot.forEach(documentSnapshot => {
-//                     transactions.push({
-//                         ...documentSnapshot.data(),
-//                         key: documentSnapshot.id,
-//                     });
-//                 });
-//                 transactions.sort((a, b) => parseInt(a.balance) - parseInt(b.balance));
-//                 return transactions;
-//             });
-//     },
-// );
-
 export const getTransactions = createAsyncThunk(
     'transactions/getTransactions',
     async (accountNum) => {
@@ -58,25 +40,6 @@ export const getAccounts = createAsyncThunk(
             });
     },
 );
-
-// export const getAccountNumber = createAsyncThunk(
-//     'user/getAccountNumber',
-//     async (accountNumber) => {
-//         return await db.collection('bankAccounts').where('userID', '==', auth.currentUser.uid).get()
-//             .then(async snapShot => {
-//                 let accN;
-//                 snapShot.forEach(documentSnap => {
-//                     accN = documentSnap.get('accountNumber');
-//                 });
-//                 const accNumRef = db.collection('bankAccounts').doc(accN.toString());
-//                 return await db.runTransaction(async (t) => {
-//                     const doc = await t.get(accNumRef);
-//                     return doc.data().accountNumber;
-//                 });
-//             });
-//     },
-// );
-
 
 const accountsSlice = createSlice({
     name: 'getAccountInfo',
