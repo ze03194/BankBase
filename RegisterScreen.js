@@ -11,7 +11,6 @@ import {addUser} from './redux/slices/userDataSlice';
 import {useDispatch} from 'react-redux';
 import {Logo, styles} from './stylesExports';
 
-
 const db = firebase.firestore();
 const auth = firebase.auth();
 
