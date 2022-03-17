@@ -15,7 +15,7 @@ let height = Dimensions.get('window').height;
 
 const AccountsScreen = ({navigation, route}) => {
 
-    // const {accountNum} = route.params;
+   
     const transactions = useSelector(state => state.accountsReducer.transactions);
     const currentBalance = useSelector(state => state.userDataReducer.balance);
     const accountNum = useSelector(state => state.accountsReducer.accountNumber);
@@ -93,90 +93,4 @@ const AccountsScreen = ({navigation, route}) => {
         </SafeAreaView>
     );
 };
-// const styles = StyleSheet.create({
-//     mainContainer: {
-//         flex: 1,
-//         backgroundColor: '#02295F',
-//     },
-//     scrollContainer: {},
-//     welcomeText: {
-//         color: 'white',
-//         marginTop: 20,
-//         marginLeft: 15,
-//         fontSize: 25,
-//     },
-//     bottomBarText: {
-//         color: 'white',
-//         fontSize: 18,
-//     },
-//     bottomBarContainer: {
-//         flexDirection: 'row',
-//         justifyContent: 'space-between',
-//         marginBottom: 10,
-//         marginHorizontal: 10,
-//     },
-//     logoContainer: {
-//         // width: '100%',
-//         maxHeight: '10%',
-//     },
-//     logoImg: {
-//         width: '100%',
-//         height: '100%',
-//     },
-//
-//     flatListContainer: {
-//         // minWidth: 250,
-//         // minHeight: 250,
-//         minWidth: '100%',
-//         minHeight: '30%',
-//         backgroundColor: 'white',
-//         marginTop: '2.5%',
-//
-//     },
-//
-//     flatListDisplay: {
-//         flex: 1,
-//         borderTopWidth: 1.5,
-//
-//     },
-//
-//     flatListText: {
-//         color: 'black',
-//         fontWeight: 'bold',
-//     },
-//     accountBalanceText: {
-//         color: 'black',
-//         fontWeight: 'bold',
-//         marginLeft: 5,
-//     },
-//     accountOptionsContainer: {
-//         flex: 1,
-//         flexDirection: 'row',
-//         justifyContent: 'space-between',
-//         marginTop: 10,
-//         marginHorizontal: 10,
-//     },
-//     optionsText: {
-//         color: 'white',
-//         fontSize: 18,
-//     },
-//     accountsDisplay: {
-//         flex: 1,
-//         borderTopWidth: 1.5,
-//     },
-//     flatListBackground: {
-//         backgroundColor: 'white',
-//     },
-//     topFlatList: {
-//         minWidth: '75%',
-//         maxWidth: '75%',
-//         minHeight: '10%',
-//         marginTop: '5%',
-//         backgroundColor: '#02295F',
-//         alignSelf: 'center',
-//         borderWidth: 1,
-//     },
-//
-// });
-
 export default AccountsScreen;
