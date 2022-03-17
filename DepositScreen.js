@@ -46,42 +46,6 @@ const DepositScreen = ({navigation}) => {
         if (deposit.depositAmount <= 0) {
             setDepositError('Deposit amount must be greater than 0!');
         }
-
-
-        // if (numbersRegex.test(deposit.checkNumber && deposit.confirmCheckNumber)) {
-        //     alert('all numbers');
-        // } else {
-        //     alert('letters');
-        // }
-
-
-        // if (deposit.checkNumber === deposit.confirmCheckNumber) {
-        //     initiateTransaction(deposit);
-        //     alert('Deposit Successful!');
-        // } else {
-        //     setCheckError('Check Numbers Must Match!');
-        // }
-
-        // if ((deposit.checkNumber === deposit.confirmCheckNumber) && (deposit.depositAmount > 0)) {
-        //     initiateTransaction(deposit);
-        // }
-        // if (deposit.checkNumber !== deposit.confirmCheckNumber) {
-        //     setCheckError('Check Numbers Must Match!');
-        // }
-
-        //     if (deposit.depositAmount <= 0) {
-        //         setDepositError('Deposit Amount Must Be Greater Than 0');
-        //     }
-        //
-        //
-        // const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,15}$/;
-        // if (passwordRegex.test(deposit.checkNumber)) {
-        //     setCheckError('no error');
-        // } else {
-        //     setCheckError('error');
-        // }
-
-
     };
 
     const changeTextInput = (key, value) => {
@@ -93,9 +57,6 @@ const DepositScreen = ({navigation}) => {
 
     return (
         <SafeAreaView style={styles.mainContainer}>
-            {/*<View style={styles.logoContainer}>*/}
-            {/*    <Image style={styles.logoImg} source={require('../BankBaseMobile/images/BankBaseLogo.png')}/>*/}
-            {/*</View>*/}
             <Logo/>
             <ScrollView contentContainerStyle={styles.scrollContainer}>
                 <View style={styles.inputTextContainer}>
@@ -134,18 +95,12 @@ const DepositScreen = ({navigation}) => {
                             fontWeight: 'bold',
                             marginBottom: 8,
                         }}>{depositError}</Text>
-                    )}
-                    {/*<TouchableOpacity style={styles.depositButton} onPress={() => {*/}
-                    {/*    dispatch(initiateTransaction(deposit));*/}
-                    {/*}}>*/}
-
+                    )}                 
                     <TouchableOpacity style={styles.submitButton} onPress={() => confirmInput()}>
                         <Text style={styles.textButton}>Deposit</Text>
                     </TouchableOpacity>
                 </View>
             </ScrollView>
-
-
             <View style={styles.bottomBarContainer}>
                 <TouchableOpacity onPress={() => firebase.auth().signOut()}>
                     <Text style={styles.bottomBarText}>Log Out</Text>
@@ -160,68 +115,5 @@ const DepositScreen = ({navigation}) => {
         </SafeAreaView>
     );
 };
-
-// const styles = StyleSheet.create({
-//     mainContainer: {
-//         flex: 1,
-//         backgroundColor: '#02295F',
-//     },
-//     scrollContainer: {
-//         flex: 1,
-//         justifyContent: 'center',
-//     },
-//     bottomBarText: {
-//         color: 'white',
-//         fontSize: 18,
-//     },
-//     bottomBarContainer: {
-//         flexDirection: 'row',
-//         justifyContent: 'space-between',
-//         marginBottom: 10,
-//         marginHorizontal: 10,
-//     },
-//     logoContainer: {
-//         maxHeight: '10%',
-//     },
-//     logoImg: {
-//         width: '100%',
-//         height: '100%',
-//     },
-//     inputTextContainer: {
-//         flex: 1,
-//         alignItems: 'center',
-//         marginTop: 30,
-//     },
-//     inputText: {
-//         backgroundColor: 'white',
-//         width: '64%',
-//         borderBottomWidth: 1,
-//         marginBottom: 7,
-//     },
-//     depositButton: {
-//         alignItems: 'center',
-//         paddingVertical: 12,
-//         paddingHorizontal: 32,
-//         borderRadius: 20,
-//         width: '40%',
-//         elevation: 3,
-//         backgroundColor: 'white',
-//         borderWidth: 2,
-//     },
-//     textButton: {
-//         fontSize: 16,
-//         lineHeight: 21,
-//         fontWeight: 'bold',
-//         letterSpacing: 0.25,
-//         color: '#02295F',
-//     },
-//     inputValidatorContainer: {
-//         backgroundColor: 'gray',
-//         minHeight: 150,
-//         minWidth: 250,
-//
-//     },
-//
-// });
 
 export default DepositScreen;
