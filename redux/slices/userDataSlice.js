@@ -56,7 +56,6 @@ const userDataSlice = createSlice({
     reducers: {
         addUser: (state, action) => {
             const {newUser} = action.payload;
-            // const accNum = Math.floor(10000000 + Math.random() * 99999999);
 
             auth.createUserWithEmailAndPassword(newUser.emailAddress, newUser.password)
                 .then(() => {
@@ -71,17 +70,7 @@ const userDataSlice = createSlice({
                             city: newUser.city,
                             state: newUser.state,
                             zipCode: newUser.zipCode,
-                        });
-                    // .then(() => {
-                    //     db.collection('bankAccounts').doc(accNum.toString()).set({
-                    //         userID: auth.currentUser.uid,
-                    //         balance: Math.floor(10000 + Math.random() * 99999),
-                    //         accountNumber: accNum,
-                    //     })
-                    //         .then((result) => {
-                    //             console.log(result);
-                    //         });
-                    // });
+                        });                 
                 })
                 .catch(error => {
                     alert(error);
@@ -99,17 +88,6 @@ const userDataSlice = createSlice({
         [getUser.rejected]: (state, action) => {
             state.status = 'failed';
         },
-
-        // [getAccountNumber.pending]: (state, action) => {
-        //     state.status = 'loading';
-        // },
-        // [getAccountNumber.fulfilled]: (state, action) => {
-        //     state.status = 'success';
-        //     state.accountNumber = action.payload;
-        // },
-        // [getAccountNumber.rejected]: (state, action) => {
-        //     state.status = 'failed';
-        // },
         [getBalance.pending]: (state, action) => {
             state.status = 'loading';
         },
@@ -125,5 +103,4 @@ const userDataSlice = createSlice({
 });
 
 export const {addUser} = userDataSlice.actions;
-
 export default userDataSlice.reducer;
