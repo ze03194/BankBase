@@ -1,3 +1,3 @@
-BankBase is an app that demonstrates basic CRUD operations. Users have the ability to create a new account with BankBase. After a new account is created,
+BankBase is an app that demonstrates CRUD operations. Users have the ability to create a new account with BankBase. After a new account is created,
 they may create new checkings / savings accounts that are associated with the generated user id. Users also have the ability of transferring and receiving 
 transactions, as well as tracking the transactions. To make a transaction, users will need the recipients bank account number, routing number, as well as the recipients first and last name. With the given input, both the user and recipient is then mapped from the Firestore and updated accordingly. React Native, JavaScript, and Redux Tool-kit are used for the frontend development, while I chose to use Firebase for data storage.
