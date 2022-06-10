@@ -11,10 +11,6 @@ import {useIsFocused} from '@react-navigation/native';
 import {getUser} from './redux/slices/userDataSlice';
 import {Logo, styles} from './stylesExports';
 
-// const db = firebase.firestore();
-// const auth = firebase.auth();
-// const Stack = createNativeStackNavigator();
-
 const LoggedInScreen = ({navigation}, props) => {
     const user = useSelector(state => state.userDataReducer.currentUser);
     const accounts = useSelector(state => state.accountsReducer.accounts);
@@ -28,7 +24,6 @@ const LoggedInScreen = ({navigation}, props) => {
     
     return (
         <SafeAreaView style={styles.mainContainer}>
-
             <Logo/>
             <Text style={styles.welcomeText}>Welcome, {user.firstName}!</Text>
             <View style={styles.flatListContainer}>
